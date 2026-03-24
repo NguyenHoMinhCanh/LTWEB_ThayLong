@@ -15,6 +15,7 @@
 </head>
 <body>
 <script>
+    // Guard
     (function () {
         try {
             if (localStorage.getItem("isAdmin") !== "true") {
@@ -26,6 +27,8 @@
         }
     })();
 </script>
+
+<!-- TOPBAR -->
 <header class="cui-topbar">
     <div class="cui-topbar__inner container-fluid">
         <div class="d-flex align-items-center gap-3">
@@ -100,6 +103,7 @@
                         </li>
                     </ul>
                 </li>
+                <!-- Users -->
                 <li class="has-children">
                     <a class="s-item s-parent" href="#" onclick="return false;">
                         <span><i class="bi bi-people me-2"></i>Users</span>
@@ -111,6 +115,7 @@
                     </ul>
                 </li>
 
+                <!--Orders-->
                 <li class="has-children force-open">
                     <a class="s-item s-parent" href="#" onclick="return false;">
                         <span><i class="bi bi-receipt me-2"></i>Đơn hàng</span>
@@ -121,6 +126,8 @@
                             hàng</a></li>
                     </ul>
                 </li>
+
+                <!--News-->
                 <li class="has-children force-open">
                     <a class="s-item s-parent" href="#" onclick="return false;">
                         <span><i class="bi bi-newspaper me-2"></i>Tin tức</span>
@@ -132,8 +139,9 @@
                     </ul>
                 </li>
 
+                <!--Policies-->
                 <li><a class="s-item" href="policies.html"><i class="bi bi-shield-check me-2"></i>Chính sách</a></li>
-
+                <!-- ==== QUẢN LÝ CHUNG ==== -->
                 <li class="has-children">
                     <a class="s-item s-parent" href="#" onclick="return false;">
                         <span><i class="bi bi-sliders2 me-2"></i>Quản lý chung</span>
@@ -157,6 +165,8 @@
         </div>
     </aside>
 
+
+    <!-- MAIN -->
     <main class="flex-grow-1 p-3">
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb mb-0">
@@ -182,6 +192,7 @@
                     </button>
                 </div>
 
+                <!-- Modal -->
                 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
                      aria-hidden="true">
                     <div class="modal-dialog">
@@ -308,6 +319,7 @@
     </main>
 </div>
 
+<!-- MODAL: Add/Edit Brand -->
 <div class="modal fade" id="modalBrand" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <form class="modal-content" id="formBrand">
@@ -353,6 +365,7 @@
 
 <input id="fileImport" type="file" accept="application/json" hidden>
 
+<!-- Libs -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -361,6 +374,7 @@
 
 <script>
     (() => {
+        // ===== Helpers nhỏ (không đụng dữ liệu ngoài DOM) =====
         const slugify = (s) =>
             (s || "")
                 .toString()
@@ -376,10 +390,13 @@
                 ? '<span class="badge text-bg-success">Hiển thị</span>'
                 : '<span class="badge text-bg-secondary">Ẩn</span>';
 
+        // DataTable
         const dt = new DataTable('#tblBrands', {
+            // Phân trang giống users
             pageLength: 10,
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, 'Tất cả']],
 
+            // Bố cục có dropdown số dòng (pageLength) + ô tìm kiếm mặc định của DataTable
             layout: {
                 topStart: 'pageLength',
                 topEnd: 'search',
@@ -391,6 +408,8 @@
                 {targets: -1, orderable: false, className: 'text-end text-nowrap'}
             ],
 
+
+            // Việt hoá
             language: {
                 search: 'Tìm kiếm:',
                 lengthMenu: 'Hiển thị _MENU_ dòng',
@@ -401,16 +420,19 @@
             }
         });
 
+        // ===== Modal / Form =====
         const modalEl = document.getElementById("modalBrand");
         const brandModal = modalEl ? new bootstrap.Modal(modalEl) : null;
         const form = document.getElementById("formBrand");
         const title = document.getElementById("titleBrand");
-        let editingRow = null;
+        let editingRow = null; // lưu row đang sửa (DataTables row)
 
+        // Tự điền slug khi gõ tên (nếu slug đang trống)
         form?.name?.addEventListener("input", () => {
             if (!form.slug.value) form.slug.value = slugify(form.name.value);
         });
 
+        // ===== Nút Thêm: mở modal rỗng =====
         document.getElementById("btnAddBrand")?.addEventListener("click", () => {
             editingRow = null;
             if (!form || !brandModal) return;
@@ -420,16 +442,19 @@
             brandModal.show();
         });
 
+        // ===== Hành động trên từng dòng (Edit/Delete) – uỷ quyền qua tbody =====
         $("#tblBrands tbody").on("click", "button", function () {
             const $btn = $(this);
             const $tr = $btn.closest("tr");
             const row = dt.row($tr);
 
+            // Nhận biết nút theo class (như HTML của bạn): outline-secondary = Sửa; outline-danger = Xoá
             const isEdit = $btn.hasClass("btn-outline-secondary");
             const isDel = $btn.hasClass("btn-outline-danger");
 
             if (isEdit) {
-                const data = row.data();
+                const data = row.data(); // [id, name, slug, badgeHtml, buttonsHtml]
+                // Đổ vào form:
                 editingRow = row;
                 if (!form || !brandModal) return;
                 title.textContent = "Sửa nhãn hàng";
@@ -450,6 +475,7 @@
             }
         });
 
+        // ===== Submit form (Thêm / Sửa) – cập nhật trực tiếp bảng đang thấy =====
         form?.addEventListener("submit", (e) => {
             e.preventDefault();
             const data = {
@@ -457,6 +483,7 @@
                 name: (form.name.value || "").trim(),
                 slug: (form.slug.value || "").trim() || slugify(form.name.value),
                 published: form.published.value === "true",
+                // description: (form.description.value || "").trim(), // chưa dùng vì bảng không có cột
             };
             if (!data.id || !data.name) {
                 alert("Vui lòng nhập Mã và Tên nhãn hàng");
@@ -477,18 +504,22 @@
             ];
 
             if (editingRow) {
+                // Cập nhật dòng đang sửa
                 editingRow.data(rowArr).draw(false);
             } else {
+                // Thêm dòng mới
                 dt.row.add(rowArr).draw(false);
             }
             brandModal?.hide();
         });
 
+        // ===== Tìm kiếm ngoài (ô brandSearch) nối với DataTables =====
         const txtSearch = document.getElementById("brandSearch");
         txtSearch?.addEventListener("input", () => {
             dt.search(txtSearch.value).draw();
         });
 
+        // ===== CSV / In / Reset (chỉ thao tác trên bảng đang có – không dùng storage) =====
         document.getElementById("btnCsv")?.addEventListener("click", () => {
             const rows = dt.rows({search: "applied"}).data().toArray(); // theo filter hiện tại
             const header = ["Mã", "Tên", "Slug", "Hiển thị"];
@@ -509,6 +540,7 @@
 
         document.getElementById("btnReset")?.addEventListener("click", () => {
             if (!confirm("Khôi phục về dữ liệu ban đầu trên trang?")) return;
+            // Reload trang để lấy lại HTML nguyên gốc
             location.reload();
         });
     })();

@@ -95,7 +95,7 @@
                             <label for="slug" class="form-label">Slug</label>
                             <input type="text" class="form-control" id="slug" name="slug"
                                    value="${brand != null ? brand.slug : ''}">
-                            <div class="form-text">URL-friendly name</div>
+                            <div class="form-text">URL-friendly name (tự động tạo nếu để trống)</div>
                         </div>
 
                         <div class="mb-3">
@@ -199,12 +199,12 @@
             if (!slugInput.value.trim()) {
                 const slug = this.value
                     .toLowerCase()
-                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Remove accents
                     .replace(/đ/g, 'd')
-                    .replace(/[^a-z0-9\s-]/g, '')
+                    .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
                     .trim()
-                    .replace(/\s+/g, '-')
-                    .replace(/-+/g, '-');
+                    .replace(/\s+/g, '-') // Replace spaces with -
+                    .replace(/-+/g, '-'); // Replace multiple - with single -
                 slugInput.value = slug;
             }
         });

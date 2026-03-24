@@ -1,0 +1,13 @@
+<%
+    {
+        request.setAttribute("ctx", request.getContextPath());
+
+        String __adm_pageTitle = (String) request.getAttribute("pageTitle");
+        if (__adm_pageTitle == null) __adm_pageTitle = "Admin";
+        request.setAttribute("pageTitleResolved", __adm_pageTitle);
+
+        String __adm_activePage = (String) request.getAttribute("activePage");
+        if (__adm_activePage == null) __adm_activePage = "";
+        request.setAttribute("activePageResolved", __adm_activePage);
+    }
+%>

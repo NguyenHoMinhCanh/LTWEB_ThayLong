@@ -156,6 +156,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // Auto-hide alerts after 5 seconds
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(function (alert) {
             setTimeout(function () {
@@ -164,6 +165,7 @@
             }, 5000);
         });
 
+        // Remove URL parameters after showing alert to prevent reload loop
         if (window.location.search.includes('success') || window.location.search.includes('error')) {
             setTimeout(function () {
                 const url = new URL(window.location);

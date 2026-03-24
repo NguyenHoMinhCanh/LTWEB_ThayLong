@@ -163,4 +163,13 @@ body{
     .adm-sidebar.show{
         left: 0;
     }
+    /* Chart */
+    .chart-box {
+        position: relative;
+        height: 260px;
+    }
+    .chart-box canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
 }

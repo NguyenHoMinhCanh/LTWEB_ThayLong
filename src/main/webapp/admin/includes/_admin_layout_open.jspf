@@ -1,0 +1,8 @@
+<%@ include file="/admin/includes/_admin_head.jspf" %>
+<%@ include file="/admin/includes/_admin_topbar.jspf" %>
+
+<div class="adm-shell">
+    <%@ include file="/admin/includes/_admin_sidebar.jspf" %>
+
+    <main class="adm-main">
+        <div class="adm-content">

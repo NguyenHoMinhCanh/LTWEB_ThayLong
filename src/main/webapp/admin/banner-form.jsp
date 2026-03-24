@@ -60,7 +60,7 @@
             <div class="col-12 col-lg-6">
                 <label class="form-label">Link (khi bấm vào banner)</label>
                 <input class="form-control" name="link" value="${isEdit ? banner.link : ''}" placeholder="VD: products?sale=1"/>
-                <div class="form-text">Có thể để trống nếu banner.</div>
+                <div class="form-text">Có thể để trống nếu banner không cần click.</div>
             </div>
 
             <div class="col-12 col-lg-4">
@@ -72,7 +72,7 @@
                     </c:forEach>
                 </select>
                 <div class="form-text">
-                    HOME_TOP: banner top. SHOP_TOP: banner trang products.jsp.
+                    HOME_TOP: banner top (có thể nhiều). SHOP_TOP: banner trang products.jsp.
                 </div>
             </div>
 
@@ -90,6 +90,7 @@
                        value="${isEdit ? banner.image_url : ''}"
                        placeholder="VD: assets/images/banner.webp hoặc uploads/banners/..."/>
                 <div class="form-text">
+                    Nếu bạn upload file ở dưới thì hệ thống sẽ dùng file upload và bỏ qua trường này.
                 </div>
             </div>
 
@@ -146,6 +147,7 @@
         });
     }
 
+    // Nếu user nhập url thì preview theo url (nhưng chỉ khi không chọn file)
     if (urlInput) {
         urlInput.addEventListener('blur', function () {
             if (fileInput && fileInput.files && fileInput.files.length > 0) return;

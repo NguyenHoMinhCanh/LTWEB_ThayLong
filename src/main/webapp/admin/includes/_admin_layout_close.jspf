@@ -1,0 +1,5 @@
+</div>
+</main>
+</div>
+
+<%@ include file="/admin/includes/_admin_footer.jspf" %>

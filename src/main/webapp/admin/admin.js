@@ -252,7 +252,7 @@ function renderProducts() {
         <td>${fmt(p.price || 0)}</td>
         <td>${p.stock ?? 0}</td>
         <td>${p.published ? '<span class="badge text-bg-success">Hiển thị</span>'
-                : '<span class="badge text-bg-secondary">Ẩn</span>'}</td>
+                            : '<span class="badge text-bg-secondary">Ẩn</span>'}</td>
         <td class="text-end">
           <button class="btn btn-sm btn-outline-secondary me-1" data-act="edit"><i class="bi bi-pencil"></i></button>
           <button class="btn btn-sm btn-outline-danger" data-act="del"><i class="bi bi-trash"></i></button>
