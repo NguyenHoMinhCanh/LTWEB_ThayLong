@@ -1,0 +1,121 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+
+<footer class="bg-dark text-light py-5">
+    <div class="container">
+        <div class="row g-4">
+
+            <!-- THÔNG TIN = các mục navbar -->
+            <div class="col-lg-3 col-md-6">
+                <h5 class="text-uppercase mb-3">THÔNG TIN</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="${ctx}/home" class="text-light text-decoration-none">Trang chủ</a></li>
+                    <li class="mb-2"><a href="${ctx}/list-product?gender=men" class="text-light text-decoration-none">Giày nam</a></li>
+                    <li class="mb-2"><a href="${ctx}/list-product?gender=women" class="text-light text-decoration-none">Giày nữ</a></li>
+                    <li class="mb-2"><a href="${ctx}/news" class="text-light text-decoration-none">Tin tức</a></li>
+                    <li class="mb-2"><a href="${ctx}/list-product" class="text-light text-decoration-none">Thể loại</a></li>
+                    <li class="mb-2"><a href="${ctx}/list-product" class="text-light text-decoration-none">Thương hiệu</a></li>
+                    <li class="mb-2"><a href="${ctx}/list-product?sale=1" class="text-light text-decoration-none">Khuyến mãi</a></li>
+                    <li class="mb-2"><a href="#" class="text-light text-decoration-none">Liên hệ</a></li>
+                </ul>
+            </div>
+
+            <!-- DANH MỤC SẢN PHẨM = các thể loại (categories) -->
+            <div class="col-lg-3 col-md-6">
+                <h5 class="text-uppercase mb-3">DANH MỤC SẢN PHẨM</h5>
+
+                <c:set var="cats" value="${applicationScope.APP_MENU_CATEGORIES}" />
+                <c:choose>
+                    <c:when test="${not empty cats}">
+                        <ul class="list-unstyled">
+                            <c:forEach var="cate" items="${cats}">
+                                <li class="mb-2">
+                                    <a href="${ctx}/list-product?categoryId=${cate.id}"
+                                       class="text-light text-decoration-none">${cate.name}</a>
+                                </li>
+                            </c:forEach>
+                        </ul>
+                    </c:when>
+                    <c:otherwise>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><a href="${ctx}/list-product" class="text-light text-decoration-none">Tất cả sản phẩm</a></li>
+                        </ul>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+
+            <!-- CHÍNH SÁCH = giống ảnh, lấy từ DB (policies) -->
+            <div class="col-lg-3 col-md-6">
+                <h5 class="text-uppercase mb-3">CHÍNH SÁCH</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="${ctx}/news" class="text-light text-decoration-none">Tin tức</a></li>
+
+                    <c:set var="pols" value="${applicationScope.APP_MENU_POLICIES}" />
+                    <c:choose>
+                        <c:when test="${not empty pols}">
+                            <c:forEach var="p" items="${pols}" end="7">
+                                <li class="mb-2">
+                                    <a href="${ctx}/policy?slug=${p.slug}" class="text-light text-decoration-none">
+                                            ${p.title}
+                                    </a>
+                                </li>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <li class="mb-2"><a href="${ctx}/policy?slug=chinh-sach-van-chuyen" class="text-light text-decoration-none">Chính sách vận chuyển</a></li>
+                            <li class="mb-2"><a href="${ctx}/policy?slug=chinh-sach-doi-tra" class="text-light text-decoration-none">Chính sách đổi trả</a></li>
+                            <li class="mb-2"><a href="${ctx}/policy?slug=huong-dan-dat-hang" class="text-light text-decoration-none">Hướng dẫn đặt hàng</a></li>
+                            <li class="mb-2"><a href="${ctx}/policy?slug=thong-tin-thanh-toan" class="text-light text-decoration-none">Thông tin thanh toán</a></li>
+                            <li class="mb-2"><a href="${ctx}/policy?slug=thong-tin-ve-japanbaby" class="text-light text-decoration-none">Thông tin về JAPANBABY</a></li>
+                            <li class="mb-2"><a href="${ctx}/policy?slug=chinh-sach-kiem-hang" class="text-light text-decoration-none">Chính sách kiểm hàng</a></li>
+                            <li class="mb-2"><a href="${ctx}/policy?slug=chinh-sach-bao-mat" class="text-light text-decoration-none">Chính sách bảo mật</a></li>
+                        </c:otherwise>
+                    </c:choose>
+                </ul>
+            </div>
+
+            <!-- FACEBOOK -->
+            <div class="col-lg-3 col-md-6">
+                <h5 class="text-uppercase mb-3">FACEBOOK</h5>
+                <div class="bg-secondary rounded p-3 mb-3"
+                     style="height:120px;display:flex;align-items:center;justify-content:center;">
+                    <i class="bi bi-facebook fs-1 text-primary"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold">Hộ kinh doanh JAPANBABY</h6>
+                    <p class="small mb-1">MST: 0108569593</p>
+                    <p class="small">Đơn vị: UBND Quận Nam Từ Liêm cấp ngày 17/07/2018 (Sửa đổi ngày 05/11/2023)</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof bootstrap === 'undefined') return;
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (el) { return new bootstrap.Tooltip(el); });
+    });
+
+    (function () {
+        function updateCartCountFromServer() {
+            const badge = document.getElementById('cartCount');
+            if (!badge) return;
+
+            fetch('${pageContext.request.contextPath}/cart?mode=count')
+                .then(r => r.ok ? r.json() : {count: 0})
+                .then(data => {
+                    const total = Number(data.count || 0);
+                    badge.textContent = total;
+                    badge.style.display = total > 0 ? 'inline-block' : 'none';
+                })
+                .catch(() => {});
+        }
+        document.addEventListener('DOMContentLoaded', updateCartCountFromServer);
+        window.updateCartCountFromServer = updateCartCountFromServer;
+    })();
+</script>
