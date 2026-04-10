@@ -64,6 +64,13 @@ public class RegisterServlet extends HttpServlet {
         // Chuẩn hóa email trước khi xử lý
         email = email.trim().toLowerCase();
 
+        // Kiểm tra định dạng email
+        if (!email.matches("^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$")) {
+            req.setAttribute("errorMessage", "Email không đúng định dạng.");
+            req.getRequestDispatcher("/register.jsp").forward(req, resp);
+            return;
+        }
+
         // Kiểm tra xác nhận mật khẩu
         if (!password.equals(confirmPassword)) {
             req.setAttribute("errorMessage", "Mật khẩu xác nhận không khớp.");
@@ -71,9 +78,15 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        // Mật khẩu tối thiểu 8 ký tự
-        if (password.length() < 8) {
-            req.setAttribute("errorMessage", "Mật khẩu tối thiểu 8 ký tự.");
+        // Mật khẩu phải có ít nhất 8 ký tự, chữ hoa, chữ thường, số và ký tự đặc biệt
+        boolean pwOk = password.length() >= 8
+                && password.matches(".*[a-z].*")
+                && password.matches(".*[A-Z].*")
+                && password.matches(".*[0-9].*")
+                && password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?`~].*");
+        if (!pwOk) {
+            req.setAttribute("errorMessage",
+                    "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, chữ số và ký tự đặc biệt.");
             req.getRequestDispatcher("/register.jsp").forward(req, resp);
             return;
         }

@@ -84,6 +84,7 @@
                                         class="text-danger">*</span></label>
                                 <input type="email" class="form-control" id="regEmail" name="email"
                                        placeholder="Nhập email" required value="<%= valEmail %>">
+                                <div id="emailError" class="form-text text-danger d-none"></div>
                             </div>
 
                             <!-- Mật khẩu -->
@@ -97,7 +98,16 @@
                                         <i class="bi bi-eye" id="iconPwd"></i>
                                     </button>
                                 </div>
-                                <div id="pwdError" class="form-text text-danger d-none"></div>
+                                <div id="pwdStrengthBar" class="progress mt-2 d-none" style="height:5px;">
+                                    <div id="pwdStrengthFill" class="progress-bar" style="width:0%"></div>
+                                </div>
+                                <ul id="pwdRules" class="list-unstyled mt-1 mb-0 small d-none">
+                                    <li id="ruleLen">&#x2715; Ít nhất 8 ký tự</li>
+                                    <li id="ruleLow">&#x2715; Có chữ thường (a-z)</li>
+                                    <li id="ruleUp">&#x2715; Có chữ hoa (A-Z)</li>
+                                    <li id="ruleNum">&#x2715; Có chữ số (0-9)</li>
+                                    <li id="ruleSpc">&#x2715; Có ký tự đặc biệt (!@#$%...)</li>
+                                </ul>
                             </div>
 
                             <!-- Xác nhận mật khẩu -->
@@ -142,8 +152,35 @@
 <script>
     const pwd = document.getElementById('regPassword');
     const confirmPwd = document.getElementById('regConfirmPassword');
+    const emailInput = document.getElementById('regEmail');
+    const emailError = document.getElementById('emailError');
     const pwdError = document.getElementById('pwdError');
     const confirmError = document.getElementById('confirmError');
+
+    var emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+
+    function validateEmail() {
+        var val = emailInput.value.trim();
+        if (val.length === 0) {
+            emailError.classList.add('d-none');
+            emailInput.classList.remove('is-invalid', 'is-valid');
+            return true;
+        }
+        if (!emailRegex.test(val)) {
+            emailError.textContent = 'Email không đúng định dạng (ví dụ: example@gmail.com).';
+            emailError.classList.remove('d-none');
+            emailInput.classList.add('is-invalid');
+            emailInput.classList.remove('is-valid');
+            return false;
+        }
+        emailError.classList.add('d-none');
+        emailInput.classList.remove('is-invalid');
+        emailInput.classList.add('is-valid');
+        return true;
+    }
+
+    emailInput.addEventListener('input', validateEmail);
+    emailInput.addEventListener('blur', validateEmail);
 
     // Toggle ẩn/hiện mật khẩu
     document.getElementById('togglePwd').addEventListener('click', function () {
@@ -157,24 +194,59 @@
         document.getElementById('iconConfirm').className = show ? 'bi bi-eye-slash' : 'bi bi-eye';
     });
 
+    var strengthBar  = document.getElementById('pwdStrengthBar');
+    var strengthFill = document.getElementById('pwdStrengthFill');
+    var pwdRules     = document.getElementById('pwdRules');
+    var ruleLen = document.getElementById('ruleLen');
+    var ruleLow = document.getElementById('ruleLow');
+    var ruleUp  = document.getElementById('ruleUp');
+    var ruleNum = document.getElementById('ruleNum');
+    var ruleSpc = document.getElementById('ruleSpc');
+
+    function markRule(el, passed) {
+        el.style.color = passed ? '#198754' : '#dc3545';
+        el.childNodes[0].nodeValue = (passed ? '\u2714' : '\u2715') + el.childNodes[0].nodeValue.slice(1);
+    }
+
     function validatePasswords() {
         var pwVal = pwd.value;
         var cfVal = confirmPwd.value;
         var ok = true;
 
-        // Kiểm tra độ dài mật khẩu
-        if (pwVal.length > 0 && pwVal.length < 8) {
-            pwdError.textContent = 'Mật khẩu phải có ít nhất 8 ký tự.';
-            pwdError.classList.remove('d-none');
-            pwd.classList.add('is-invalid');
-            pwd.classList.remove('is-valid');
-            ok = false;
-        } else if (pwVal.length >= 8) {
-            pwdError.classList.add('d-none');
-            pwd.classList.remove('is-invalid');
-            pwd.classList.add('is-valid');
+        // Kiểm tra từng điều kiện độ mạnh
+        var hasLen = pwVal.length >= 8;
+        var hasLow = /[a-z]/.test(pwVal);
+        var hasUp  = /[A-Z]/.test(pwVal);
+        var hasNum = /[0-9]/.test(pwVal);
+        var hasSpc = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(pwVal);
+        var passCount = [hasLen, hasLow, hasUp, hasNum, hasSpc].filter(Boolean).length;
+
+        if (pwVal.length > 0) {
+            strengthBar.classList.remove('d-none');
+            pwdRules.classList.remove('d-none');
+
+            markRule(ruleLen, hasLen);
+            markRule(ruleLow, hasLow);
+            markRule(ruleUp,  hasUp);
+            markRule(ruleNum, hasNum);
+            markRule(ruleSpc, hasSpc);
+
+            // 5 điều kiện: mỗi cái 20%
+            var colors = ['#dc3545', '#dc3545', '#fd7e14', '#ffc107', '#198754'];
+            strengthFill.style.width           = (passCount * 20) + '%';
+            strengthFill.style.backgroundColor = colors[passCount - 1] || '#dc3545';
+
+            if (passCount < 5) {
+                pwd.classList.add('is-invalid');
+                pwd.classList.remove('is-valid');
+                ok = false;
+            } else {
+                pwd.classList.remove('is-invalid');
+                pwd.classList.add('is-valid');
+            }
         } else {
-            pwdError.classList.add('d-none');
+            strengthBar.classList.add('d-none');
+            pwdRules.classList.add('d-none');
             pwd.classList.remove('is-invalid', 'is-valid');
         }
 
@@ -202,9 +274,15 @@
     confirmPwd.addEventListener('input', validatePasswords);
 
     document.getElementById('registerForm').addEventListener('submit', function (e) {
-        var isValid = validatePasswords();
-        if (!isValid || confirmPwd.value !== pwd.value) {
+        var emailOk  = validateEmail();
+        var pwOk     = validatePasswords();
+        if (!emailOk || !pwOk || confirmPwd.value !== pwd.value) {
             e.preventDefault();
+            if (!emailOk && emailInput.value.trim() === '') {
+                emailError.textContent = 'Vui lòng nhập email.';
+                emailError.classList.remove('d-none');
+                emailInput.classList.add('is-invalid');
+            }
             if (confirmPwd.value === '') {
                 confirmError.textContent = 'Vui lòng nhập xác nhận mật khẩu.';
                 confirmError.className = 'form-text text-danger';
