@@ -17,7 +17,8 @@ public class RegisterServlet extends HttpServlet {
 
     private static String ensureCsrf(HttpSession session) {
         Object cur = session.getAttribute("CSRF_TOKEN");
-        if (cur != null) return String.valueOf(cur);
+        if (cur != null)
+            return String.valueOf(cur);
 
         byte[] buf = new byte[32];
         new SecureRandom().nextBytes(buf);
@@ -49,18 +50,30 @@ public class RegisterServlet extends HttpServlet {
         String name = req.getParameter("name");
         String email = req.getParameter("email");
         String password = req.getParameter("password");
+        String confirmPassword = req.getParameter("confirmPassword");
 
         if (name == null || name.isBlank() ||
                 email == null || email.isBlank() ||
-                password == null || password.isBlank()) {
-            req.setAttribute("errorMessage", "Vui lòng nhập đủ Họ tên, Email và Mật khẩu.");
+                password == null || password.isBlank() ||
+                confirmPassword == null || confirmPassword.isBlank()) {
+            req.setAttribute("errorMessage", "Vui lòng nhập đủ thông tin.");
             req.getRequestDispatcher("/register.jsp").forward(req, resp);
             return;
         }
 
-        // tối thiểu cho bài: bạn có thể siết mạnh hơn
-        if (password.length() < 6) {
-            req.setAttribute("errorMessage", "Mật khẩu tối thiểu 6 ký tự.");
+        // Chuẩn hóa email trước khi xử lý
+        email = email.trim().toLowerCase();
+
+        // Kiểm tra xác nhận mật khẩu
+        if (!password.equals(confirmPassword)) {
+            req.setAttribute("errorMessage", "Mật khẩu xác nhận không khớp.");
+            req.getRequestDispatcher("/register.jsp").forward(req, resp);
+            return;
+        }
+
+        // Mật khẩu tối thiểu 8 ký tự
+        if (password.length() < 8) {
+            req.setAttribute("errorMessage", "Mật khẩu tối thiểu 8 ký tự.");
             req.getRequestDispatcher("/register.jsp").forward(req, resp);
             return;
         }
@@ -68,15 +81,15 @@ public class RegisterServlet extends HttpServlet {
         try {
             UserDao dao = new UserDao();
             if (dao.existsByEmail(email)) {
-                req.setAttribute("errorMessage", "Email đã tồn tại, vui lòng dùng email khác.");
+                req.setAttribute("errorMessage", "Email này đã được sử dụng, vui lòng dùng email khác.");
                 req.getRequestDispatcher("/register.jsp").forward(req, resp);
                 return;
             }
 
             User u = new User();
             u.setName(name.trim());
-            u.setEmail(email.trim().toLowerCase());
-            u.setPassword(PasswordUtil.hash(password)); // HASH
+            u.setEmail(email); // đã được chuẩn hóa ở trên
+            u.setPassword(PasswordUtil.hash(password));
             u.setActive(1);
 
             int affected = dao.insert(u);
