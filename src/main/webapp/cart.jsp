@@ -146,7 +146,7 @@
                         <a class="btn btn-danger btn-lg checkout-btn fw-bold shadow-sm" href="<%=request.getContextPath()%>/checkout">
                             MUA NGAY
                         </a>
-                        <a class="btn btn-warning checkout-btn fw-semibold" href="<%=request.getContextPath()%>/huong-dan-tra-gop">
+                        <a class="btn btn-warning checkout-btn fw-semibold" href="<%=request.getContextPath()%>/installment_payment.jsp">
                             HƯỚNG DẪN TRẢ GÓP
                         </a>
                         </button>
