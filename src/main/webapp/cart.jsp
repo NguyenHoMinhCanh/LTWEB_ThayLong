@@ -95,16 +95,13 @@
                     </td>
                     <td><%=String.format("%,.0f", it.getUnitPrice())%>₫</td>
                     <td>
-                        <form class="d-flex gap-2" method="post" action="<%=ctx%>/cart">
-                            <input type="hidden" name="action" value="update"/>
-                            <input type="hidden" name="cartItemId" value="<%=it.getCartItemId()%>"/>
-                            <input type="number" class="form-control" style="max-width:110px"
-                                   name="qty" min="1" value="<%=it.getQuantity()%>"/>
-                            <button class="btn btn-outline-secondary" type="submit">Cập nhật</button>
-                        </form>
+                        <input type="number" class="form-control" style="max-width:110px"
+                               name="qty" min="1" value="<%=it.getQuantity()%>"
+                               onchange="updateCartItemQty(<%=it.getCartItemId()%>, this.value, <%=it.getUnitPrice()%>)"/>
                     </td>
-                    <td><%=String.format("%,.0f", it.getSubtotal())%>₫</td>
-                    <td>
+                    <td id="item-subtotal-<%=it.getCartItemId()%>">
+                        <%=String.format("%,.0f", it.getSubtotal())%>₫
+                    </td>
                         <form method="post" action="<%=ctx%>/cart">
                             <input type="hidden" name="action" value="remove"/>
                             <input type="hidden" name="cartItemId" value="<%=it.getCartItemId()%>"/>
@@ -226,6 +223,43 @@
     <i class="bi bi-arrow-up"></i>
 </button>
 
+<script>
+    function updateCartItemQty(cartItemId, newQty, unitPrice) {
+        if (newQty < 1) return;
+
+        // Hàm định dạng tiền tệ VNĐ
+        const formatVND = (amount) => {
+            return new Intl.NumberFormat('vi-VN').format(amount) + '₫';
+        };
+
+        // 1. Cập nhật ngay "Thành tiền" của sản phẩm đó trên giao diện (Tạo cảm giác mượt mà tức thì)
+        const newSubtotalItem = newQty * unitPrice;
+        document.getElementById('item-subtotal-' + cartItemId).innerText = formatVND(newSubtotalItem);
+
+        // 2. Gửi request ngầm lên Server để lưu vào Session/Database
+        fetch(`<%=ctx%>/cart-api/update`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `cartItemId=${cartItemId}&qty=${newQty}`
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Server trả về tổng tiền mới của toàn bộ giỏ hàng -> Cập nhật hiển thị
+                    document.getElementById('subtotal').innerText = formatVND(data.newTotal);
+                    document.getElementById('grandTotal').innerText = formatVND(data.newTotal);
+                } else {
+                    alert('Có lỗi xảy ra: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi gọi AJAX:', error);
+                // alert('Không thể kết nối đến máy chủ.');
+            });
+    }
+</script>
 
 
 
