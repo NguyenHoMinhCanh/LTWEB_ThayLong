@@ -147,7 +147,7 @@
                     </div>
                     <div class="mt-3 d-grid gap-2">
                         <a class="btn btn-danger btn-lg checkout-btn fw-bold shadow-sm" href="<%=request.getContextPath()%>/checkout">
-                            MUA NGAY
+                            THANH TOÁN NGAY
                         </a>
                         <a class="btn btn-warning checkout-btn fw-semibold" href="<%=request.getContextPath()%>/huong-dan-tra-gop">
                             HƯỚNG DẪN TRẢ GÓP
