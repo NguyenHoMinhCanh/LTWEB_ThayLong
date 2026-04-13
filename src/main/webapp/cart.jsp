@@ -146,10 +146,12 @@
                         <strong class="fs-5" id="grandTotal"><%=String.format("%,.0f", subtotal)%>₫</strong>
                     </div>
                     <div class="mt-3 d-grid gap-2">
-                        <button class="btn btn-danger checkout-btn" id="btnBuyNow">MUA NGAY - GIAO HÀNG THANH TOÁN
-                        </button>
-                        <a class="btn btn-primary checkout-btn" href="<%=request.getContextPath()%>/checkout">MUA NGAY</a>
-                        <button class="btn btn-info checkout-btn text-white" id="btnInstallment">TRẢ GÓP QUA THẺ
+                        <a class="btn btn-danger btn-lg checkout-btn fw-bold shadow-sm" href="<%=request.getContextPath()%>/checkout">
+                            MUA NGAY
+                        </a>
+                        <a class="btn btn-warning checkout-btn fw-semibold" href="<%=request.getContextPath()%>/huong-dan-tra-gop">
+                            HƯỚNG DẪN TRẢ GÓP
+                        </a>
                         </button>
                     </div>
                 </div>
