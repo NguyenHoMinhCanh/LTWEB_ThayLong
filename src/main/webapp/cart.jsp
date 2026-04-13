@@ -101,11 +101,15 @@
                     </td>
                     <td id="item-subtotal-<%=it.getCartItemId()%>">
                         <%=String.format("%,.0f", it.getSubtotal())%>₫
-                    </td>
-                        <form method="post" action="<%=ctx%>/cart">
+                    <td class="text-center">
+                        <form method="post" action="<%=ctx%>/cart"
+                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?');">
                             <input type="hidden" name="action" value="remove"/>
                             <input type="hidden" name="cartItemId" value="<%=it.getCartItemId()%>"/>
-                            <button class="btn btn-outline-danger btn-sm" type="submit">X</button>
+
+                            <button class="btn btn-outline-danger btn-sm" type="submit" title="Xóa sản phẩm">
+                                <i class="bi bi-trash"></i>
+                            </button>
                         </form>
                     </td>
                 </tr>
