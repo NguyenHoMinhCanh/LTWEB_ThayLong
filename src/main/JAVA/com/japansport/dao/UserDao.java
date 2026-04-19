@@ -284,6 +284,53 @@ public class UserDao extends DAO implements IDAO<User> {
         }
     }
 
+    // Tìm user theo email, không lọc active (dùng cho OAuth check)
+    public User findByEmail(String email) {
+        String sql = "SELECT u.id, u.email, u.password, u.name, u.phone, u.avatar, " +
+                "u.gender, u.birthday, u.active, u.auth_provider, " +
+                "(SELECT r.code FROM user_roles ur JOIN roles r ON r.id = ur.role_id " +
+                " WHERE ur.user_id = u.id ORDER BY CASE r.code " +
+                " WHEN 'ADMIN' THEN 1 WHEN 'STAFF' THEN 2 ELSE 3 END LIMIT 1) AS role_code " +
+                "FROM users u WHERE u.email = ? LIMIT 1";
+        try (Connection cn = getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return null;
+                User u = new User(rs.getInt("id"), rs.getString("email"),
+                        rs.getString("name"), rs.getString("password"), rs.getInt("active"));
+                u.setPhone(rs.getString("phone"));
+                u.setAvatar(rs.getString("avatar"));
+                u.setGender(rs.getString("gender"));
+                u.setBirthday(rs.getDate("birthday"));
+                u.setRoleCode(rs.getString("role_code"));
+                u.setAuthProvider(rs.getString("auth_provider"));
+                return u;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Tạo tài khoản từ Google (không có password)
+    public User insertGoogleUser(String email, String name) throws SQLException {
+        String sql = "INSERT INTO users (email, password, name, active, auth_provider) VALUES (?, '', ?, 1, 'google')";
+        try (Connection cn = getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, email);
+            ps.setString(2, name);
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (!keys.next()) throw new SQLException("Không lấy được ID sau insert");
+                int newId = keys.getInt(1);
+                // trả về object đủ thông tin để set session luôn
+                User u = new User(newId, email, name, "", 1);
+                u.setAuthProvider("google");
+                return u;
+            }
+        }
+    }
+
     /* Account/Profile */
     public boolean updateName(int userId, String name) {
         String sql = "UPDATE users SET name=? WHERE id=? AND active=1";

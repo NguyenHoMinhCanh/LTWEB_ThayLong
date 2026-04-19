@@ -35,6 +35,21 @@ public class RegisterServlet extends HttpServlet {
     }
 
     @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        // Nếu đã đăng nhập rồi thì không cho vào trang đăng ký (STT 12)
+        HttpSession session = req.getSession(false);
+        if (session != null && session.getAttribute("currentUser") != null) {
+            resp.sendRedirect(req.getContextPath() + "/");
+            return;
+        }
+
+        ensureCsrf(req.getSession());
+        req.getRequestDispatcher("/register.jsp").forward(req, resp);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
