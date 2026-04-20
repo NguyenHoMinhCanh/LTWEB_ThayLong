@@ -455,7 +455,7 @@ public class OrderDao extends DAO {
         }
     }
 
-    // ================== ADMIN METHODS (added) ==================
+    //ADMIN METHODS (added)
 
     /**
      * Admin hủy đơn: chỉ cho hủy khi đơn đang PENDING, đồng thời hoàn tồn kho.
@@ -648,9 +648,8 @@ public class OrderDao extends DAO {
     }
 
 
-    // ================== DASHBOARD STATS ==================
-
-    /** Tổng số đơn hàng (không lọc status). */
+    // DASHBOARD STATS
+    //Tổng số đơn hàng (không lọc status).
     public int countAllOrders() {
         String sql = "SELECT COUNT(*) AS total FROM orders";
         try {
@@ -664,7 +663,7 @@ public class OrderDao extends DAO {
         }
     }
 
-    /** Đếm đơn theo status (PENDING/PAID/SHIPPING/DONE/CANCEL). */
+    //Đếm đơn theo status (PENDING/PAID/SHIPPING/DONE/CANCEL).
     public int countByStatus(String status) {
         String sql = "SELECT COUNT(*) AS total FROM orders WHERE status = ?";
         try {
@@ -679,7 +678,7 @@ public class OrderDao extends DAO {
         }
     }
 
-    /** Doanh thu: chỉ tính đơn đã thanh toán / hoàn tất. */
+    // Doanh thu: chỉ tính đơn đã thanh toán / hoàn tất.
     public double sumRevenuePaidDone() {
         String sql = "SELECT COALESCE(SUM(total_amount), 0) AS total FROM orders WHERE status IN ('PAID','DONE')";
         try {
@@ -693,25 +692,65 @@ public class OrderDao extends DAO {
         }
     }
 
-    /**
-     * Doanh thu theo ngày trong N ngày gần nhất (tính PAID/DONE).
-     * Trả về list: mỗi phần tử là Object[]{java.sql.Date day, Double total}
-     */
-    public List<Object[]> revenueByDayLastNDays(int days) {
-        List<Object[]> list = new ArrayList<>();
+    //Lấy N đơn hàng gần nhất (tối ưu — chỉ SELECT LIMIT, không lấy toàn bộ).
+
+    public List<Order> getRecentOrders(int limit) {
+        List<Order> list = new ArrayList<>();
+        if (limit <= 0) limit = 6;
         String sql =
-                "SELECT DATE(COALESCE(updated_at, created_at)) AS d, COALESCE(SUM(total_amount),0) AS total " +
-                        "FROM orders " +
-                        "WHERE status IN ('PAID','DONE') " +
-                        "    AND COALESCE(updated_at, created_at) >= DATE_SUB(CURDATE(), INTERVAL ? DAY) " +
-                        "GROUP BY DATE(COALESCE(updated_at, created_at)) " +
-                        "ORDER BY d";
+                "SELECT o.id, o.user_id, o.address_id, o.total_amount, o.status, o.created_at, o.updated_at, " +
+                "u.name AS user_name, u.email AS user_email, " +
+                "a.full_name, a.phone, a.address_line, a.city, a.district, a.ward " +
+                "FROM orders o " +
+                "JOIN users u ON u.id = o.user_id " +
+                "JOIN user_addresses a ON a.id = o.address_id " +
+                "ORDER BY o.created_at DESC, o.id DESC " +
+                "LIMIT ?";
         try {
             PreparedStatement ps = getPreparedStatement(sql);
-            ps.setInt(1, Math.max(0, days - 1));
+            ps.setInt(1, limit);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                list.add(new Object[]{rs.getDate("d"), rs.getDouble("total")});
+                Order o = new Order();
+                o.setId(rs.getInt("id"));
+                o.setUserId(rs.getInt("user_id"));
+                o.setAddressId(rs.getInt("address_id"));
+                o.setTotalAmount(rs.getDouble("total_amount"));
+                o.setStatus(rs.getString("status"));
+                o.setCreatedAt(rs.getTimestamp("created_at"));
+                o.setUpdatedAt(rs.getTimestamp("updated_at"));
+                o.setUserName(rs.getString("user_name"));
+                o.setUserEmail(rs.getString("user_email"));
+                o.setFullName(rs.getString("full_name"));
+                o.setPhone(rs.getString("phone"));
+                o.setAddressLine(rs.getString("address_line"));
+                o.setCity(rs.getString("city"));
+                o.setDistrict(rs.getString("district"));
+                o.setWard(rs.getString("ward"));
+                list.add(o);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // doanh thu theo month
+    public List<Object[]> revenueByMonthLast12() {
+        List<Object[]> list = new ArrayList<>();
+
+        String sql =
+                "SELECT DATE_FORMAT(COALESCE(updated_at, created_at), '%Y-%m') AS m, " +
+                        "       COALESCE(SUM(total_amount),0) AS total " +
+                        "FROM orders " +
+                        "WHERE status IN ('PAID','DONE') " +
+                        "    AND COALESCE(updated_at, created_at) >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH) " +
+                        "GROUP BY m ORDER BY m";
+        try {
+            PreparedStatement ps = getPreparedStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(new Object[]{rs.getString("m"), rs.getDouble("total")});
             }
             return list;
         } catch (SQLException e) {

@@ -37,7 +37,7 @@ public class AdminDashboardController extends HttpServlet {
         request.setAttribute("adminName", currentUser != null ? currentUser.getName() : "Admin");
         request.setAttribute("pageTitle", "Dashboard");
 
-        // ========== STATS ==========
+        // STATS
         int totalProducts = productDao.countAll();
         int totalUsers = userDao.countAllUsers();
         int activeUsers = userDao.countActiveUsers();
@@ -52,27 +52,27 @@ public class AdminDashboardController extends HttpServlet {
         orderStatusCounts.put("DONE", orderDao.countByStatus("DONE"));
         orderStatusCounts.put("CANCEL", orderDao.countByStatus("CANCEL"));
 
-        // Recent orders (top 6)
-        List<Order> recentOrders = orderDao.adminGetAll(null, null);
-        if (recentOrders != null && recentOrders.size() > 6) {
-            recentOrders = recentOrders.subList(0, 6);
+        // Recent orders (top 6) — chỉ fetch đúng 6 dòng từ DB
+        List<Order> recentOrders = orderDao.getRecentOrders(6);
+
+        // Revenue chart last 12 months
+        Map<String, Double> revenueByMonth = new HashMap<>();
+        for (Object[] row : orderDao.revenueByMonthLast12()) {
+            String m = (String) row[0];
+            Double v = (Double) row[1];
+            revenueByMonth.put(m, v);
         }
 
-        // Revenue chart last 7 days (PAID/DONE)
-        Map<String, Double> revenueByDay = new HashMap<>();
-        for (Object[] row : orderDao.revenueByDayLastNDays(7)) {
-            Date d = (Date) row[0];
-            Double v = (Double) row[1];
-            revenueByDay.put(d.toString(), v);
-        }
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM");
-        List<String> chartLabels = new ArrayList<>();
-        List<Double> chartValues = new ArrayList<>();
-        LocalDate today = LocalDate.now();
-        for (int i = 6; i >= 0; i--) {
-            LocalDate day = today.minusDays(i);
-            chartLabels.add(day.format(fmt));
-            chartValues.add(revenueByDay.getOrDefault(day.toString(), 0d));
+        DateTimeFormatter monthKeyFmt = DateTimeFormatter.ofPattern("yyyy-MM");
+        DateTimeFormatter monthLabelFmt = DateTimeFormatter.ofPattern("MM/yyyy");
+        List<String> monthLabels = new ArrayList<>();
+        List<Double> monthValues = new ArrayList<>();
+        LocalDate now = LocalDate.now();
+        for (int i = 11; i >= 0; i--) {
+            LocalDate d = now.minusMonths(i);
+            String key = d.format(monthKeyFmt);
+            monthLabels.add(d.format(monthLabelFmt));
+            monthValues.add(revenueByMonth.getOrDefault(key, 0d));
         }
 
         request.setAttribute("totalProducts", totalProducts);
@@ -82,8 +82,8 @@ public class AdminDashboardController extends HttpServlet {
         request.setAttribute("totalRevenue", totalRevenue);
         request.setAttribute("orderStatusCounts", orderStatusCounts);
         request.setAttribute("recentOrders", recentOrders);
-        request.setAttribute("chartLabels", chartLabels);
-        request.setAttribute("chartValues", chartValues);
+        request.setAttribute("monthLabels", monthLabels);
+        request.setAttribute("monthValues", monthValues);
 
         // Forward đến trang admin dashboard
         request.getRequestDispatcher("/admin/dashboard.jsp").forward(request, response);
