@@ -1,0 +1,10 @@
+db.host=localhost
+db.port=3306
+db.username=root
+db.password=mat_khau_cua_ban_o_day
+db.dbName=web
+
+# Google OAuth2
+google.clientId=nhap_client_id_cua_ban_vao_day
+google.clientSecret=nhap_client_secret_cua_ban_vao_day
+google.redirectUri=http://localhost:8080/auth/google/callback
