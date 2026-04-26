@@ -6,6 +6,7 @@ public class User {
     String password;
     String name;
     int active;
+    String authProvider; // "local" hoặc "google"
 
     // update#profile (optional; phone nên để String)
     String phone;            // VARCHAR trong DB (giữ số 0 đầu, +84...)
@@ -22,7 +23,8 @@ public class User {
         this.id = id;
         this.name = name;
         this.password = password;
-        this.roleCode = "USER"; // default
+        this.roleCode = "USER";
+        this.authProvider = "local";
     }
 
     // (Tuỳ chọn) constructor có role
@@ -33,6 +35,7 @@ public class User {
 
     public User() {
         this.roleCode = "USER";
+        this.authProvider = "local";
     }
 
     public int getActive() {
@@ -106,6 +109,14 @@ public class User {
 
     public void setBirthday(java.sql.Date birthday) {
         this.birthday = birthday;
+    }
+
+    public String getAuthProvider() {
+        return authProvider;
+    }
+
+    public void setAuthProvider(String authProvider) {
+        this.authProvider = (authProvider == null) ? "local" : authProvider;
     }
 
     // ===== role getters/setters =====

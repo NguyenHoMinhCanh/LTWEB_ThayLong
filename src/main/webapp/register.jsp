@@ -14,6 +14,12 @@
     String ctx = request.getContextPath();
     String err = (String) request.getAttribute("errorMessage");
 
+    // Nếu đã đăng nhập thì redirect về trang chủ
+    if (session.getAttribute("currentUser") != null) {
+        response.sendRedirect(ctx + "/");
+        return;
+    }
+
     if (session.getAttribute("CSRF_TOKEN") == null) {
         java.security.SecureRandom rng = new java.security.SecureRandom();
         byte[] buf = new byte[32];
@@ -126,6 +132,19 @@
                             </div>
 
                             <button type="submit" id="btnRegister" class="btn btn-danger w-100">Đăng ký</button>
+
+                            <!-- Hoặc đăng ký bằng Google -->
+                            <div class="d-flex align-items-center my-3 gap-2">
+                                <hr class="flex-grow-1 m-0">
+                                <span class="text-muted small">hoặc</span>
+                                <hr class="flex-grow-1 m-0">
+                            </div>
+                            <a href="<%= ctx %>/auth/google"
+                               class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2">
+                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                                     width="20" alt="Google">
+                                Đăng ký bằng Google
+                            </a>
 
                             <% if (err != null) { %>
                             <div class="alert alert-danger mt-3 mb-0"><%= err %>
