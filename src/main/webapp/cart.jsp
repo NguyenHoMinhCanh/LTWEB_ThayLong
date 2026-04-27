@@ -23,26 +23,20 @@
     session.removeAttribute("cartError");
 %>
 
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Japan Sport - Header với Bootstrap</title>
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet"/>
-
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css"
-          rel="stylesheet"/>
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet"/>
     <link href="assets/css/style.css" rel="stylesheet"/>
 </head>
 <body>
 <div class="topbar section hidden-xs hidden-sm">
     <a class="section block a-center" href="#">
-        <img src="assets/images/banner.webp" alt="Siêu bão khuyến mãi cuối năm"
-             style="width:100%;height:auto;display:flex;">
+        <img src="assets/images/banner.webp" alt="Siêu bão khuyến mãi cuối năm" style="width:100%;height:auto;display:flex;">
     </a>
 </div>
 
@@ -79,15 +73,12 @@
                 <tr>
                     <td>
                         <a href="<%=ctx%>/product-detail?id=<%=it.getProductId()%>">
-                            <img src="<%=it.getImageUrl()%>"
-                                 style="width:90px;height:90px;object-fit:cover;border-radius:10px;"
-                                 class="cart-img-link">
+                            <img src="<%=it.getImageUrl()%>" style="width:90px;height:90px;object-fit:cover;border-radius:10px;" class="cart-img-link">
                         </a>
                     </td>
                     <td>
                         <div class="fw-semibold">
-                            <a href="<%=ctx%>/product-detail?id=<%=it.getProductId()%>"
-                               class="text-decoration-none text-dark product-detail-link">
+                            <a href="<%=ctx%>/product-detail?id=<%=it.getProductId()%>" class="text-decoration-none text-dark product-detail-link">
                                 <%=it.getProductName()%>
                             </a>
                         </div>
@@ -97,9 +88,11 @@
                     </td>
                     <td><%=String.format("%,.0f", it.getUnitPrice())%>₫</td>
                     <td>
-                        <input type="number" class="form-control" style="max-width:110px"
+                        <input type="number" class="form-control qty-input" style="max-width:110px"
                                name="qty" min="1" value="<%=it.getQuantity()%>"
-                               onchange="updateCartItemQty(<%=it.getCartItemId()%>, this.value, <%=it.getUnitPrice()%>)"/>
+                               data-price="<%=it.getUnitPrice()%>"
+                               data-id="<%=it.getCartItemId()%>"
+                               onchange="updateCartItemQty(this)"/>
                     </td>
                     <td id="item-subtotal-<%=it.getCartItemId()%>">
                         <%=String.format("%,.0f", it.getSubtotal())%>₫
@@ -122,8 +115,6 @@
         </div>
         <% } %>
 
-
-
         <div class="row mt-4 g-4">
             <div class="col-lg-7">
                 <form method="post" action="<%=ctx%>/cart" class="d-inline">
@@ -132,25 +123,27 @@
                         <i class="bi bi-trash3 me-1"></i> Xoá toàn bộ giỏ
                     </button>
                 </form>
-
             </div>
+
             <div class="col-lg-5">
-                <div class="totals-box">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span>Tạm tính</span>
-                        <strong id="subtotal"><%=String.format("%,.0f", subtotal)%>₫</strong>
+                <div class="totals-box p-4 bg-white rounded shadow-sm border">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Tạm tính</span>
+                        <strong id="subtotal" class="fs-6"><%=String.format("%,.0f", subtotal)%>₫</strong>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span>Phí vận chuyển</span>
-                        <span id="shipping">0₫</span>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Phí vận chuyển</span>
+                        <span id="shipping" class="fw-semibold">0₫</span>
                     </div>
-                    <div class="line my-3"></div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fs-5">Thành tiền</span>
-                        <strong class="fs-5" id="grandTotal"><%=String.format("%,.0f", subtotal)%>₫</strong>
+                    <hr class="text-muted opacity-25 my-3">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="fs-5 fw-bold text-uppercase">Thành tiền</span>
+                        <strong class="fs-3 text-danger fw-bolder" id="grandTotal"><%=String.format("%,.0f", subtotal)%>₫</strong>
                     </div>
                     <div class="mt-3 d-grid gap-2">
-                        <a class="btn btn-danger btn-lg checkout-btn fw-bold shadow-sm" href="<%=request.getContextPath()%>/checkout">
+                        <a class="btn btn-danger btn-lg checkout-btn fw-bold shadow-sm"
+                           href="javascript:void(0);"
+                           onclick="goToCheckout('<%=ctx%>/checkout')">
                             MUA NGAY
                         </a>
                         <a class="btn btn-warning checkout-btn fw-semibold" href="<%=request.getContextPath()%>/installment_payment.jsp">
@@ -162,52 +155,53 @@
         </div>
     </div>
 </main>
+
 <section class="bg-light py-4">
     <div class="container">
         <div class="row g-3">
-            <div class="col-lg-3 col-6">  <div class="d-flex align-items-center">
-                <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
-                    <div class="col-3 pt-2 ">
-                        <img src="assets/images/footer/srv_1.png" alt="Service Item"
-                             class="img-fluid rounded ">
+            <div class="col-lg-3 col-6">
+                <div class="d-flex align-items-center">
+                    <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
+                        <div class="col-3 pt-2 ">
+                            <img src="assets/images/footer/srv_1.png" alt="Service Item" class="img-fluid rounded ">
+                        </div>
+                        <div><h6 class="fw-bold mb-1">VẬN CHUYỂN SIÊU TỐC</h6>
+                            <small class="text-muted">Vận chuyển nội thành HN trong 2 tiếng!</small></div>
                     </div>
-                    <div><h6 class="fw-bold mb-1">VẬN CHUYỂN SIÊU TỐC</h6>
-                        <small class="text-muted">Vận chuyển nội thành HN trong 2 tiếng!</small></div>
                 </div>
             </div>
-            </div>
-            <div class="col-lg-3 col-6">  <div class="d-flex align-items-center">
-                <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
-                    <div class="col-3 p-0 ">
-                        <img src="assets/images/footer/srv_2.png" alt="Service Item"
-                             class="img-fluid rounded ">
+            <div class="col-lg-3 col-6">
+                <div class="d-flex align-items-center">
+                    <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
+                        <div class="col-3 p-0 ">
+                            <img src="assets/images/footer/srv_2.png" alt="Service Item" class="img-fluid rounded ">
+                        </div>
+                        <div><h6 class="fw-bold mb-1">ĐỔI HÀNG</h6>
+                            <small class="text-muted">Đổi hàng trong 7 ngày miễn phí!</small></div>
                     </div>
-                    <div><h6 class="fw-bold mb-1">ĐỔI HÀNG</h6>
-                        <small class="text-muted">Đổi hàng trong 7 ngày miễn phí!</small></div>
                 </div>
             </div>
-            </div>
-            <div class="col-lg-3 col-6"> <div class="d-flex align-items-center">
-                <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
-                    <div class="col-3 p-0 ">
-                        <img src="assets/images/footer/srv_3.png" alt="Service Item"
-                             class="img-fluid rounded ">
+            <div class="col-lg-3 col-6">
+                <div class="d-flex align-items-center">
+                    <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
+                        <div class="col-3 p-0 ">
+                            <img src="assets/images/footer/srv_3.png" alt="Service Item" class="img-fluid rounded ">
+                        </div>
+                        <div><h6 class="fw-bold mb-1">TIẾT KIỆM THỜI GIAN</h6>
+                            <small class="text-muted">Mua sắm dễ hơn khi online</small></div>
                     </div>
-                    <div><h6 class="fw-bold mb-1">TIẾT KIỆM THỜI GIAN</h6>
-                        <small class="text-muted">Mua sắm dễ hơn khi online</small></div>
                 </div>
             </div>
-            </div>
-            <div class="col-lg-3 col-6"> <div class="d-flex align-items-center">
-                <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
-                    <div class="col-3 p-0 ">
-                        <img src="assets/images/footer/srv_4.png" alt="Service Item"
-                             class="img-fluid rounded ">
+            <div class="col-lg-3 col-6">
+                <div class="d-flex align-items-center">
+                    <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
+                        <div class="col-3 p-0 ">
+                            <img src="assets/images/footer/srv_4.png" alt="Service Item" class="img-fluid rounded ">
+                        </div>
+                        <div><h6 class="fw-bold mb-1">ĐỊA CHỈ CỬA HÀNG</h6>
+                            <small class="text-muted">Lotus 4, Vinhome Gardenia, Hàm Nghi, Từ Liêm, HN</small></div>
                     </div>
-                    <div><h6 class="fw-bold mb-1">ĐỊA CHỈ CỬA HÀNG</h6>
-                        <small class="text-muted">Lotus 4, Vinhome Gardenia, Hàm Nghi, Từ Liêm, HN</small></div>
                 </div>
-            </div>
             </div>
         </div>
     </div>
@@ -242,7 +236,7 @@
 
 <style>
     .product-detail-link:hover {
-        color: #dc3545 !important; /* Màu đỏ Accent */
+        color: #dc3545 !important;
         text-decoration: underline !important;
     }
     .cart-img-link:hover {
@@ -254,64 +248,108 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // --- THÊM Ở ĐÂY: Xử lý sự kiện cho Modal Xóa ---
+    // --- 1. XỬ LÝ CẬP NHẬT SỐ LƯỢNG (AJAX) ---
+    function updateCartItemQty(input) {
+        const cartItemId = input.getAttribute('data-id');
+        const newQty = parseInt(input.value);
+        const unitPrice = parseFloat(input.getAttribute('data-price'));
+        const formatVND = (n) => new Intl.NumberFormat('vi-VN').format(n) + '₫';
+
+        if (newQty < 1) return;
+
+        // Cập nhật "Thành tiền" của dòng
+        const rowSubtotal = newQty * unitPrice;
+        const subtotalEl = document.getElementById('item-subtotal-' + cartItemId);
+        if (subtotalEl) subtotalEl.innerText = formatVND(rowSubtotal);
+
+        // Tính lại tổng tiền
+        let total = 0;
+        document.querySelectorAll('.qty-input').forEach(inp => {
+            const price = parseFloat(inp.getAttribute('data-price'));
+            const q = parseInt(inp.value);
+            total += price * q;
+        });
+
+        // Hiển thị tổng tiền mới
+        const subtotalTotalEl = document.getElementById('subtotal');
+        const grandTotalEl = document.getElementById('grandTotal');
+        if (subtotalTotalEl) subtotalTotalEl.innerText = formatVND(total);
+        if (grandTotalEl) grandTotalEl.innerText = formatVND(total);
+
+        fetch("<%=ctx%>/cart", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: "action=update&cartItemId=" + cartItemId + "&qty=" + newQty
+        })
+            .then(response => {
+                if (!response.ok) console.error("Lỗi: Không thể lưu dữ liệu vào máy chủ.");
+            })
+            .catch(error => console.error('Lỗi kết nối:', error));
+    }
+
+    // --- 2. XỬ LÝ CHUYỂN TRANG THANH TOÁN AN TOÀN ---
+    async function goToCheckout(checkoutUrl) {
+        const btn = document.querySelector('.checkout-btn');
+        if (!btn) return;
+
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
+        btn.style.pointerEvents = 'none';
+
+        try {
+            const inputs = document.querySelectorAll('.qty-input');
+            const promises = [];
+
+            // Gửi dữ liệu lưu lần cuối trước khi sang trang
+            inputs.forEach(input => {
+                const cartItemId = input.getAttribute('data-id');
+                const qty = input.value;
+                if (qty >= 1) {
+                    // SỬA LỖI Ở ĐÂY: Dùng nối chuỗi (+)
+                    const req = fetch("<%=ctx%>/cart", {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: "action=update&cartItemId=" + cartItemId + "&qty=" + qty
+                    });
+                    promises.push(req);
+                }
+            });
+
+            // Chờ lưu xong 100% rồi mới đi
+            await Promise.all(promises);
+            window.location.href = checkoutUrl;
+
+        } catch (error) {
+            console.error('Lỗi khi chuẩn bị thanh toán:', error);
+            btn.innerHTML = originalText;
+            btn.style.pointerEvents = 'auto';
+            alert('Có lỗi xảy ra khi lưu giỏ hàng, vui lòng thử lại!');
+        }
+    }
+
+    // --- 3. XỬ LÝ MODAL XÁC NHẬN XÓA ---
     let currentDeleteId = null;
+    const deleteModalEl = document.getElementById('deleteConfirmModal');
+    let deleteModal = null;
+
+    if (deleteModalEl) {
+        deleteModal = new bootstrap.Modal(deleteModalEl);
+    }
 
     function openDeleteModal(cartItemId) {
         currentDeleteId = cartItemId;
-        // Khởi tạo và hiển thị Modal
-        const myModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-        myModal.show();
+        if (deleteModal) deleteModal.show();
     }
 
-    // Lắng nghe sự kiện click nút Đồng ý trong Modal
-    document.getElementById('btnConfirmDelete').addEventListener('click', function() {
-        if (currentDeleteId) {
-            const form = document.getElementById('delete-form-' + currentDeleteId);
-            if (form) {
-                form.submit();
+    const confirmBtn = document.getElementById('btnConfirmDelete');
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', function() {
+            if (currentDeleteId) {
+                const form = document.getElementById('delete-form-' + currentDeleteId);
+                if (form) form.submit();
             }
-        }
-    });
-    // ----------------------------------------------
-
-    function updateCartItemQty(cartItemId, newQty, unitPrice) {
-        if (newQty < 1) return;
-
-        // Hàm định dạng tiền tệ VNĐ
-        const formatVND = (amount) => {
-            return new Intl.NumberFormat('vi-VN').format(amount) + '₫';
-        };
-
-        // 1. Cập nhật ngay "Thành tiền" của sản phẩm đó trên giao diện (Tạo cảm giác mượt mà tức thì)
-        const newSubtotalItem = newQty * unitPrice;
-        document.getElementById('item-subtotal-' + cartItemId).innerText = formatVND(newSubtotalItem);
-
-        // 2. Gửi request ngầm lên Server để lưu vào Session/Database
-        fetch(`<%=ctx%>/cart-api/update`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `cartItemId=${cartItemId}&qty=${newQty}`
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Server trả về tổng tiền mới của toàn bộ giỏ hàng -> Cập nhật hiển thị
-                    document.getElementById('subtotal').innerText = formatVND(data.newTotal);
-                    document.getElementById('grandTotal').innerText = formatVND(data.newTotal);
-                } else {
-                    alert('Có lỗi xảy ra: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Lỗi khi gọi AJAX:', error);
-                // alert('Không thể kết nối đến máy chủ.');
-            });
+        });
     }
-
 </script>
-
 </body>
 </html>
