@@ -85,10 +85,19 @@
                 <% for (CartItem it : cartItems) { %>
                 <tr>
                     <td>
-                        <img src="<%=it.getImageUrl()%>" style="width:90px;height:90px;object-fit:cover;border-radius:10px;">
+                        <a href="<%=ctx%>/product-detail?id=<%=it.getProductId()%>">
+                            <img src="<%=it.getImageUrl()%>"
+                                 style="width:90px;height:90px;object-fit:cover;border-radius:10px;"
+                                 class="cart-img-link">
+                        </a>
                     </td>
                     <td>
-                        <div class="fw-semibold"><%=it.getProductName()%></div>
+                        <div class="fw-semibold">
+                            <a href="<%=ctx%>/product-detail?id=<%=it.getProductId()%>"
+                               class="text-decoration-none text-dark product-detail-link">
+                                <%=it.getProductName()%>
+                            </a>
+                        </div>
                         <% if (it.getVariantId() != null) { %>
                         <div class="text-muted small">Màu: <%=it.getColor()%> | Size: <%=it.getSize()%></div>
                         <% } %>
@@ -226,7 +235,16 @@
         title="Lên đầu trang" aria-label="Lên đầu trang">
     <i class="bi bi-arrow-up"></i>
 </button>
-
+<style>
+    .product-detail-link:hover {
+        color: #dc3545 !important; /* Màu đỏ Accent */
+        text-decoration: underline !important;
+    }
+    .cart-img-link:hover {
+        opacity: 0.8;
+        transition: 0.3s;
+    }
+</style>
 <script>
     function updateCartItemQty(cartItemId, newQty, unitPrice) {
         if (newQty < 1) return;
@@ -263,6 +281,7 @@
                 // alert('Không thể kết nối đến máy chủ.');
             });
     }
+
 </script>
 
 
