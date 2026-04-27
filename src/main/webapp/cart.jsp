@@ -85,10 +85,19 @@
                 <% for (CartItem it : cartItems) { %>
                 <tr>
                     <td>
-                        <img src="<%=it.getImageUrl()%>" style="width:90px;height:90px;object-fit:cover;border-radius:10px;">
+                        <a href="<%=ctx%>/product-detail?id=<%=it.getProductId()%>">
+                            <img src="<%=it.getImageUrl()%>"
+                                 style="width:90px;height:90px;object-fit:cover;border-radius:10px;"
+                                 class="cart-img-link">
+                        </a>
                     </td>
                     <td>
-                        <div class="fw-semibold"><%=it.getProductName()%></div>
+                        <div class="fw-semibold">
+                            <a href="<%=ctx%>/product-detail?id=<%=it.getProductId()%>"
+                               class="text-decoration-none text-dark product-detail-link">
+                                <%=it.getProductName()%>
+                            </a>
+                        </div>
                         <% if (it.getVariantId() != null) { %>
                         <div class="text-muted small">Màu: <%=it.getColor()%> | Size: <%=it.getSize()%></div>
                         <% } %>
@@ -101,11 +110,15 @@
                     </td>
                     <td id="item-subtotal-<%=it.getCartItemId()%>">
                         <%=String.format("%,.0f", it.getSubtotal())%>₫
-                    </td>
-                        <form method="post" action="<%=ctx%>/cart">
+                    <td class="text-center">
+                        <form method="post" action="<%=ctx%>/cart"
+                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?');">
                             <input type="hidden" name="action" value="remove"/>
                             <input type="hidden" name="cartItemId" value="<%=it.getCartItemId()%>"/>
-                            <button class="btn btn-outline-danger btn-sm" type="submit">X</button>
+
+                            <button class="btn btn-outline-danger btn-sm" type="submit" title="Xóa sản phẩm">
+                                <i class="bi bi-trash"></i>
+                            </button>
                         </form>
                     </td>
                 </tr>
@@ -146,7 +159,7 @@
                         <a class="btn btn-danger btn-lg checkout-btn fw-bold shadow-sm" href="<%=request.getContextPath()%>/checkout">
                             MUA NGAY
                         </a>
-                        <a class="btn btn-warning checkout-btn fw-semibold" href="<%=request.getContextPath()%>/huong-dan-tra-gop">
+                        <a class="btn btn-warning checkout-btn fw-semibold" href="<%=request.getContextPath()%>/installment_payment.jsp">
                             HƯỚNG DẪN TRẢ GÓP
                         </a>
                         </button>
@@ -222,7 +235,16 @@
         title="Lên đầu trang" aria-label="Lên đầu trang">
     <i class="bi bi-arrow-up"></i>
 </button>
-
+<style>
+    .product-detail-link:hover {
+        color: #dc3545 !important; /* Màu đỏ Accent */
+        text-decoration: underline !important;
+    }
+    .cart-img-link:hover {
+        opacity: 0.8;
+        transition: 0.3s;
+    }
+</style>
 <script>
     function updateCartItemQty(cartItemId, newQty, unitPrice) {
         if (newQty < 1) return;
@@ -259,6 +281,7 @@
                 // alert('Không thể kết nối đến máy chủ.');
             });
     }
+
 </script>
 
 
