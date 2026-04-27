@@ -31,18 +31,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Japan Sport - Header với Bootstrap</title>
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet"/>
 
-    <!-- Bootstrap Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css"
           rel="stylesheet"/>
 
-    <!-- App CSS -->
     <link href="assets/css/style.css" rel="stylesheet"/>
 </head>
 <body>
-<!-- Banner quảng cáo -->
 <div class="topbar section hidden-xs hidden-sm">
     <a class="section block a-center" href="#">
         <img src="assets/images/banner.webp" alt="Siêu bão khuyến mãi cuối năm"
@@ -50,10 +46,8 @@
     </a>
 </div>
 
-<!-- HEADER + navbar -->
 <%@ include file="/WEB-INF/jspf/site_header.jspf" %>
 
-<!-- Main Content -->
 <main class="bg-light py-5">
     <div class="cart-container">
         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -61,7 +55,6 @@
             <a href="${ctx}/list-product" class="continue-link btn btn-outline-dark">Tiếp tục mua hàng</a>
         </div>
 
-        <!-- Cart Table -->
         <% if (cartError != null) { %>
         <div class="alert alert-danger"><%=cartError%></div>
         <% } %>
@@ -110,13 +103,14 @@
                     </td>
                     <td id="item-subtotal-<%=it.getCartItemId()%>">
                         <%=String.format("%,.0f", it.getSubtotal())%>₫
+                    </td>
                     <td class="text-center">
-                        <form method="post" action="<%=ctx%>/cart"
-                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?');">
+                        <form method="post" action="<%=ctx%>/cart" id="delete-form-<%=it.getCartItemId()%>">
                             <input type="hidden" name="action" value="remove"/>
                             <input type="hidden" name="cartItemId" value="<%=it.getCartItemId()%>"/>
 
-                            <button class="btn btn-outline-danger btn-sm" type="submit" title="Xóa sản phẩm">
+                            <button class="btn btn-outline-danger btn-sm rounded-circle" type="button" title="Xóa sản phẩm"
+                                    onclick="openDeleteModal(<%=it.getCartItemId()%>)">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>
@@ -162,79 +156,90 @@
                         <a class="btn btn-warning checkout-btn fw-semibold" href="<%=request.getContextPath()%>/installment_payment.jsp">
                             HƯỚNG DẪN TRẢ GÓP
                         </a>
-                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </main>
-<!-- Features Service -->
 <section class="bg-light py-4">
     <div class="container">
         <div class="row g-3">
-            <div class="col-lg-3 col-6">  <!--srv1-->
-                <div class="d-flex align-items-center">
-                    <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
-                        <div class="col-3 pt-2 ">
-                            <img src="assets/images/footer/srv_1.png" alt="Service Item"
-                                 class="img-fluid rounded ">
-                        </div>
-                        <div><h6 class="fw-bold mb-1">VẬN CHUYỂN SIÊU TỐC</h6>
-                            <small class="text-muted">Vận chuyển nội thành HN trong 2 tiếng!</small></div>
+            <div class="col-lg-3 col-6">  <div class="d-flex align-items-center">
+                <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
+                    <div class="col-3 pt-2 ">
+                        <img src="assets/images/footer/srv_1.png" alt="Service Item"
+                             class="img-fluid rounded ">
                     </div>
+                    <div><h6 class="fw-bold mb-1">VẬN CHUYỂN SIÊU TỐC</h6>
+                        <small class="text-muted">Vận chuyển nội thành HN trong 2 tiếng!</small></div>
                 </div>
             </div>
-            <div class="col-lg-3 col-6">  <!--srv2-->
-                <div class="d-flex align-items-center">
-                    <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
-                        <div class="col-3 p-0 ">
-                            <img src="assets/images/footer/srv_2.png" alt="Service Item"
-                                 class="img-fluid rounded ">
-                        </div>
-                        <div><h6 class="fw-bold mb-1">ĐỔI HÀNG</h6>
-                            <small class="text-muted">Đổi hàng trong 7 ngày miễn phí!</small></div>
+            </div>
+            <div class="col-lg-3 col-6">  <div class="d-flex align-items-center">
+                <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
+                    <div class="col-3 p-0 ">
+                        <img src="assets/images/footer/srv_2.png" alt="Service Item"
+                             class="img-fluid rounded ">
                     </div>
+                    <div><h6 class="fw-bold mb-1">ĐỔI HÀNG</h6>
+                        <small class="text-muted">Đổi hàng trong 7 ngày miễn phí!</small></div>
                 </div>
             </div>
-            <div class="col-lg-3 col-6"> <!--srv3-->
-                <div class="d-flex align-items-center">
-                    <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
-                        <div class="col-3 p-0 ">
-                            <img src="assets/images/footer/srv_3.png" alt="Service Item"
-                                 class="img-fluid rounded ">
-                        </div>
-                        <div><h6 class="fw-bold mb-1">TIẾT KIỆM THỜI GIAN</h6>
-                            <small class="text-muted">Mua sắm dễ hơn khi online</small></div>
+            </div>
+            <div class="col-lg-3 col-6"> <div class="d-flex align-items-center">
+                <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
+                    <div class="col-3 p-0 ">
+                        <img src="assets/images/footer/srv_3.png" alt="Service Item"
+                             class="img-fluid rounded ">
                     </div>
+                    <div><h6 class="fw-bold mb-1">TIẾT KIỆM THỜI GIAN</h6>
+                        <small class="text-muted">Mua sắm dễ hơn khi online</small></div>
                 </div>
             </div>
-            <div class="col-lg-3 col-6"> <!--srv4-->
-                <div class="d-flex align-items-center">
-                    <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
-                        <div class="col-3 p-0 ">
-                            <img src="assets/images/footer/srv_4.png" alt="Service Item"
-                                 class="img-fluid rounded ">
-                        </div>
-                        <div><h6 class="fw-bold mb-1">ĐỊA CHỈ CỬA HÀNG</h6>
-                            <small class="text-muted">Lotus 4, Vinhome Gardenia, Hàm Nghi, Từ Liêm, HN</small></div>
+            </div>
+            <div class="col-lg-3 col-6"> <div class="d-flex align-items-center">
+                <div class="feature-item d-flex align-items-start mb-4 p-3 bg-light rounded">
+                    <div class="col-3 p-0 ">
+                        <img src="assets/images/footer/srv_4.png" alt="Service Item"
+                             class="img-fluid rounded ">
                     </div>
+                    <div><h6 class="fw-bold mb-1">ĐỊA CHỈ CỬA HÀNG</h6>
+                        <small class="text-muted">Lotus 4, Vinhome Gardenia, Hàm Nghi, Từ Liêm, HN</small></div>
                 </div>
+            </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Footer -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger rounded-pill px-4" id="btnConfirmDelete">Đồng ý xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <%@ include file="/WEB-INF/jspf/site_footer.jspf" %>
 
-<!-- Back to top -->
 <button class="btn btn-danger position-fixed bottom-0 end-0 m-4 rounded-circle"
         style="width:50px;height:50px;z-index:1000;"
         onclick="window.scrollTo({top:0,behavior:'smooth'})"
         title="Lên đầu trang" aria-label="Lên đầu trang">
     <i class="bi bi-arrow-up"></i>
 </button>
+
 <style>
     .product-detail-link:hover {
         color: #dc3545 !important; /* Màu đỏ Accent */
@@ -245,7 +250,31 @@
         transition: 0.3s;
     }
 </style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
 <script>
+    // --- THÊM Ở ĐÂY: Xử lý sự kiện cho Modal Xóa ---
+    let currentDeleteId = null;
+
+    function openDeleteModal(cartItemId) {
+        currentDeleteId = cartItemId;
+        // Khởi tạo và hiển thị Modal
+        const myModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+        myModal.show();
+    }
+
+    // Lắng nghe sự kiện click nút Đồng ý trong Modal
+    document.getElementById('btnConfirmDelete').addEventListener('click', function() {
+        if (currentDeleteId) {
+            const form = document.getElementById('delete-form-' + currentDeleteId);
+            if (form) {
+                form.submit();
+            }
+        }
+    });
+    // ----------------------------------------------
+
     function updateCartItemQty(cartItemId, newQty, unitPrice) {
         if (newQty < 1) return;
 
@@ -283,8 +312,6 @@
     }
 
 </script>
-
-
 
 </body>
 </html>
