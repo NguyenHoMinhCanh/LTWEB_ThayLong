@@ -138,7 +138,19 @@
                             <input type="hidden" name="id" id="imageId">
                             <div class="mb-2">
                                 <label class="form-label">Image URL <span class="text-danger">*</span></label>
-                                <input type="url" class="form-control" name="image_url" id="imageUrl" required>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="image_url" id="imageUrl" placeholder="Nhập URL hoặc chọn file bên dưới">
+                                    <button class="btn btn-outline-secondary" type="button" id="btnPickFile" title="Chọn ảnh từ máy tính">
+                                        <i class="bi bi-folder2-open me-1"></i>Chọn ảnh
+                                    </button>
+                                </div>
+                                <input type="file" id="imageFileInput" accept="image/*" style="display:none;">
+                                <div id="uploadProgress" class="mt-1" style="display:none;">
+                                    <div class="d-flex align-items-center gap-2 text-muted small">
+                                        <div class="spinner-border spinner-border-sm" role="status"></div>
+                                        <span>Đang tải ảnh lên server...</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="mb-2">
                                 <label class="form-label">Alt</label>
