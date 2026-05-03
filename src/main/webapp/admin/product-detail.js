@@ -193,7 +193,41 @@ function resetImageForm() {
     document.getElementById('imageActive').checked = true;
     document.getElementById('imageMain').checked = false;
     document.getElementById('btnImageSave').innerHTML = '<i class="bi bi-save me-1"></i>Lưu';
+    const fi = document.getElementById('imageFileInput');
+    if (fi) fi.value = '';
     hideImagePreview();
+}
+
+async function uploadImageFile(file) {
+    const progress = document.getElementById('uploadProgress');
+    const btn = document.getElementById('btnPickFile');
+    try {
+        if (progress) progress.style.display = 'block';
+        if (btn) btn.disabled = true;
+
+        const fd = new FormData();
+        fd.append('action', 'upload');
+        fd.append('file', file);
+
+        const res = await fetch(API_IMAGES, { method: 'POST', body: fd });
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.success) {
+            throw new Error(data.message || `HTTP ${res.status}`);
+        }
+
+        // Điền URL vào ô input và hiện preview
+        const urlInput = document.getElementById('imageUrl');
+        urlInput.value = data.url;
+        showImagePreview(data.url);
+        showToast('Tải ảnh lên thành công!');
+    } catch (err) {
+        console.error(err);
+        showToast(err.message || 'Lỗi khi upload ảnh', 'danger');
+    } finally {
+        if (progress) progress.style.display = 'none';
+        if (btn) btn.disabled = false;
+    }
 }
 
 function showImagePreview(url) {
@@ -413,6 +447,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('btnReloadImages')?.addEventListener('click', loadImages);
     document.querySelector('#tblImages')?.addEventListener('click', handleImageTableClick);
     document.getElementById('imageUrl')?.addEventListener('input', (e) => showImagePreview(e.target.value));
+
+    // Nút "Chọn ảnh" → mở dialog chọn file
+    document.getElementById('btnPickFile')?.addEventListener('click', () => {
+        document.getElementById('imageFileInput')?.click();
+    });
+    // Khi chọn file xong → upload lên server
+    document.getElementById('imageFileInput')?.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (file) uploadImageFile(file);
+    });
 
     // Specs
     document.getElementById('formSpec')?.addEventListener('submit', submitSpecForm);

@@ -9,15 +9,22 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @WebServlet(name = "ManageProductImageAdminServlet", urlPatterns = {"/admin/product-images"})
-@MultipartConfig
+@MultipartConfig(maxFileSize = 10 * 1024 * 1024, maxRequestSize = 20 * 1024 * 1024)
 public class ManageProductImageAdminServlet extends HttpServlet {
 
     private final ProductImageDao imageDao = new ProductImageDao();
@@ -67,6 +74,9 @@ public class ManageProductImageAdminServlet extends HttpServlet {
                 break;
             case "setMain":
                 handleSetMain(request, response);
+                break;
+            case "upload":
+                handleUpload(request, response);
                 break;
             default:
                 sendError(response, "Invalid action");
@@ -132,7 +142,7 @@ public class ManageProductImageAdminServlet extends HttpServlet {
         img.setSortOrder(parseInt(request.getParameter("sort_order"), 0));
         img.setActive(!"0".equals(request.getParameter("active")));
 
-        // ✅ nếu admin tick "main" trong form update => đảm bảo main duy nhất theo (product + color)
+        // nếu admin tick "main" trong form update => đảm bảo main duy nhất theo (product + color)
         boolean wantMain = "1".equals(request.getParameter("is_main")) || "on".equalsIgnoreCase(request.getParameter("is_main"));
 
         boolean ok = imageDao.update(img);
@@ -152,6 +162,53 @@ public class ManageProductImageAdminServlet extends HttpServlet {
         }
 
         sendSuccess(response, "Updated", img);
+    }
+
+    private void    handleUpload(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        Part filePart = request.getPart("file");
+        if (filePart == null || filePart.getSize() == 0) {
+            sendError(response, "No file uploaded");
+            return;
+        }
+
+        // Lấy tên file gốc và extension
+        String submittedFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+        String ext = "";
+        int dotIdx = submittedFileName.lastIndexOf('.');
+        if (dotIdx >= 0) ext = submittedFileName.substring(dotIdx).toLowerCase();
+
+        // Chỉ cho phép ảnh
+        if (!ext.matches(".*(jpg|jpeg|png|gif|webp|bmp|svg)")) {
+            sendError(response, "Chỉ chấp nhận file ảnh (jpg, png, gif, webp...)");
+            return;
+        }
+
+        // Tạo tên file unique để tránh trùng
+        String newFileName = UUID.randomUUID().toString().replace("-", "") + ext;
+
+        // Đường dẫn lưu trên server
+        String uploadDir = getServletContext().getRealPath("/uploads/products");
+        File dir = new File(uploadDir);
+        if (!dir.exists()) dir.mkdirs();
+
+        File saveFile = new File(dir, newFileName);
+        try (InputStream is = filePart.getInputStream()) {
+            Files.copy(is, saveFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        // Trả về URL tương đối để dùng trong <img src>
+        String contextPath = request.getContextPath();
+        String imageUrl = contextPath + "/uploads/products/" + newFileName;
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("success", true);
+        payload.put("message", "Uploaded");
+        payload.put("url", imageUrl);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        out.print(gson.toJson(payload));
+        out.flush();
     }
 
     private void handleDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
