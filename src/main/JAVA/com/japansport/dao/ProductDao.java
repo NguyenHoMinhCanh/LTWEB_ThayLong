@@ -65,8 +65,17 @@ public class ProductDao extends DAO {
             p.setActive(rs.getInt("active") == 1);
         } catch (SQLException ignored) {}
 
+        // Nhãn promotion - chỉ có khi query có JOIN với bảng promotions
+        try {
+            String label = rs.getString("promo_label");
+            if (label != null && !label.isEmpty()) {
+                p.setPromotionLabel(label);
+            }
+        } catch (SQLException ignored) {}
+
         return p;
     }
+
 
     /**
      * Map ResultSet có JOIN với bảng brand/category (nếu cần chi tiết).
@@ -244,11 +253,19 @@ public class ProductDao extends DAO {
         try {
             String dbGender = mapGenderCode(gender);
 
-            String sql = "SELECT id, name, description, price, old_price, image_url, " +
-                    "gender, category_id, brand_id, active, created_at, updated_at " +
-                    "FROM products " +
-                    "WHERE gender = ? AND active = 1 " +
-                    "ORDER BY updated_at DESC, id DESC " +
+            String sql = "SELECT p.id, p.name, p.description, p.price, p.old_price, p.image_url, " +
+                    "p.gender, p.category_id, p.brand_id, p.active, p.created_at, p.updated_at, " +
+                    "pr.label AS promo_label " +
+                    "FROM products p " +
+                    "LEFT JOIN product_promotions pp ON pp.product_id = p.id " +
+                    "LEFT JOIN promotions pr ON pr.id = pp.promotion_id " +
+                    "    AND pr.active = 1 " +
+                    "    AND (pr.start_date IS NULL OR pr.start_date <= NOW()) " +
+                    "    AND (pr.end_date IS NULL OR pr.end_date >= NOW()) " +
+                    "WHERE p.gender = ? AND p.active = 1 " +
+                    "GROUP BY p.id, p.name, p.description, p.price, p.old_price, p.image_url, " +
+                    "p.gender, p.category_id, p.brand_id, p.active, p.created_at, p.updated_at, pr.label " +
+                    "ORDER BY p.updated_at DESC, p.id DESC " +
                     "LIMIT ?";
 
             PreparedStatement ps = getPreparedStatement(sql);
@@ -270,11 +287,19 @@ public class ProductDao extends DAO {
         List<Product> list = new ArrayList<>();
         if (limit <= 0) limit = 8;
         try {
-            String sql = "SELECT id, name, description, price, old_price, image_url, " +
-                    "gender, category_id, brand_id, active, created_at, updated_at " +
-                    "FROM products " +
-                    "WHERE active = 1 " +
-                    "ORDER BY created_at DESC, id DESC " +
+            String sql = "SELECT p.id, p.name, p.description, p.price, p.old_price, p.image_url, " +
+                    "p.gender, p.category_id, p.brand_id, p.active, p.created_at, p.updated_at, " +
+                    "pr.label AS promo_label " +
+                    "FROM products p " +
+                    "LEFT JOIN product_promotions pp ON pp.product_id = p.id " +
+                    "LEFT JOIN promotions pr ON pr.id = pp.promotion_id " +
+                    "    AND pr.active = 1 " +
+                    "    AND (pr.start_date IS NULL OR pr.start_date <= NOW()) " +
+                    "    AND (pr.end_date IS NULL OR pr.end_date >= NOW()) " +
+                    "WHERE p.active = 1 " +
+                    "GROUP BY p.id, p.name, p.description, p.price, p.old_price, p.image_url, " +
+                    "p.gender, p.category_id, p.brand_id, p.active, p.created_at, p.updated_at, pr.label " +
+                    "ORDER BY p.created_at DESC, p.id DESC " +
                     "LIMIT ?";
             PreparedStatement ps = getPreparedStatement(sql);
             ps.setInt(1, limit);

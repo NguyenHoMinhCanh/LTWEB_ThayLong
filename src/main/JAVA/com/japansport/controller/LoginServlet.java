@@ -78,6 +78,7 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String back = request.getParameter("back");
+        boolean remember = "on".equals(request.getParameter("remember"));
 
         if (email == null || email.isBlank() || password == null || password.isBlank()) {
             request.setAttribute("errorMessage", "Vui lòng nhập email và mật khẩu.");
@@ -95,6 +96,18 @@ public class LoginServlet extends HttpServlet {
 
                 HttpSession session = request.getSession();
                 session.setAttribute("currentUser", user);
+
+                // Xử lý cookie ghi nhớ email
+                Cookie rememberCookie = new Cookie("rememberEmail", "");
+                if (remember) {
+                    rememberCookie.setValue(email.trim().toLowerCase());
+                    rememberCookie.setMaxAge(30 * 24 * 60 * 60); // 30 ngày
+                } else {
+                    rememberCookie.setMaxAge(0); // xóa cookie nếu không tick
+                }
+                rememberCookie.setPath("/");
+                rememberCookie.setHttpOnly(true);
+                response.addCookie(rememberCookie);
 
                 String ctx = request.getContextPath();
 

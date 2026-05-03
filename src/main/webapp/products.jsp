@@ -366,8 +366,10 @@
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="product-card h-100 d-flex flex-column">
 
-                            <%-- RIBBON (giữ nguyên nếu bạn có) --%>
-                            <span class="ribbon">SALE</span>
+                            <%-- RIBBON: nhãn từ DB, chỉ hiện khi có promotion đang active --%>
+                            <% if (p.isSale()) { %>
+                            <span class="ribbon"><%= p.getPromotionLabel() %></span>
+                            <% } %>
 
                             <%-- ẢNH: GIỮ CLASS product-thumb, chỉ thêm khung tỉ lệ để đồng đều --%>
                             <a class="product-thumb ratio ratio-1x1 mb-0"

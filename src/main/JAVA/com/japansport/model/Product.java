@@ -13,6 +13,9 @@ public class Product {
     private Integer brandId;      // id thương hiệu, có thể null
     private boolean active = true;   // 1: hiển thị, 0: ẩn
 
+    // Nhãn promotion từ DB (null = không có khuyến mãi nào đang active)
+    private String promotionLabel;
+
     // Tham chiếu sang Brand (dùng khi JOIN để hiển thị logo, tên brand)
     private Brand brand;
 
@@ -71,6 +74,14 @@ public class Product {
     public void setOld_price(double old_price) {
         this.old_price = old_price;
     }
+
+    // Sản phẩm có nhãn khuyến mãi khi DB gán promotion đang active cho nó
+    public boolean isSale() {
+        return promotionLabel != null && !promotionLabel.isEmpty();
+    }
+
+    public String getPromotionLabel() { return promotionLabel; }
+    public void setPromotionLabel(String promotionLabel) { this.promotionLabel = promotionLabel; }
 
     // ========== GENDER ==========
     public String getGender() {

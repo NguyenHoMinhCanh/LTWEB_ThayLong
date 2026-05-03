@@ -1,3 +1,18 @@
+/*
+ Navicat Premium Dump SQL
+
+ Source Server         : local
+ Source Server Type    : MySQL
+ Source Server Version : 90100 (9.1.0)
+ Source Host           : localhost:3306
+ Source Schema         : web
+
+ Target Server Type    : MySQL
+ Target Server Version : 90100 (9.1.0)
+ File Encoding         : 65001
+
+ Date: 10/03/2026 11:30:37
+*/
 drop database web;
 create database web;
 use web;
@@ -1818,5 +1833,32 @@ INSERT INTO `users` VALUES (4, 'user2@example.com', 'user123', 'Trần Thị B',
 INSERT INTO `users` VALUES (5, 'user3@example.com', 'user123', 'Lê C', NULL, NULL, NULL, NULL, 1, '2025-12-11 23:44:51', '2026-01-15 16:21:44');
 INSERT INTO `users` VALUES (6, 'tronglinh2708@...', 'pbkdf2$...', 'linh', NULL, NULL, NULL, NULL, 1, '2025-12-30 01:38:48', '2025-12-30 01:38:48');
 INSERT INTO `users` VALUES (7, 'tronglinh2708@gmail.com', 'pbkdf2$120000$S7E3T34QEDn0CEtTnCQC_w$1OdEJrDwCldbgHMRuxSC0TpTlM3HxPhrdmeJ5jZvFTU', 'linh trọng', '', 'uploads/avatars/u7_622cc253-28f6-4672-b56e-b704b77e0db6.jpg', NULL, NULL, 1, '2026-01-03 00:22:49', '2026-01-16 08:18:59');
+
+
+-- ----------------------------
+-- Table structure for promotions (nền móng module khuyến mãi)
+-- ----------------------------
+DROP TABLE IF EXISTS `product_promotions`;
+DROP TABLE IF EXISTS `promotions`;
+CREATE TABLE `promotions` (
+  `id`         INT NOT NULL AUTO_INCREMENT,
+  `name`       VARCHAR(100) NOT NULL COMMENT 'Tên đợt: Flash Sale 30/4, Clearance...',
+  `label`      VARCHAR(20)  NOT NULL DEFAULT 'SALE' COMMENT 'Nhãn hiển thị trên card: SALE, HOT, -30%...',
+  `start_date` DATETIME     NULL     DEFAULT NULL,
+  `end_date`   DATETIME     NULL     DEFAULT NULL,
+  `active`     TINYINT(1)   NOT NULL DEFAULT 1,
+  `created_at` DATETIME     NULL     DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
+-- Bảng liên kết sản phẩm <-> promotion (nhiều-nhiều, chuẩn bị mở rộng sau)
+CREATE TABLE `product_promotions` (
+  `product_id`    INT NOT NULL,
+  `promotion_id`  INT NOT NULL,
+  `sale_price`    DECIMAL(15,2) NULL DEFAULT NULL COMMENT 'Giá bán trong đợt, NULL = dùng price gốc',
+  PRIMARY KEY (`product_id`, `promotion_id`) USING BTREE,
+  CONSTRAINT `fk_pp_product`   FOREIGN KEY (`product_id`)   REFERENCES `products`    (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_pp_promotion` FOREIGN KEY (`promotion_id`) REFERENCES `promotions`  (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;

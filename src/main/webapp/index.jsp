@@ -1,7 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
+
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <%
     String ctx = request.getContextPath();
@@ -149,7 +151,7 @@
                             </a>
                             <div class="p-3">
                                 <div class="product-title">${p.name}</div>
-                                <div class="text-danger fw-bold">${p.price}đ</div>
+                                <div class="text-danger fw-bold"><fmt:formatNumber value="${p.price}" pattern="#,###"/>đ</div>
                             </div>
                         </div>
                     </div>
@@ -201,7 +203,7 @@
                             </a>
                             <div class="p-3">
                                 <div class="product-title">${p.name}</div>
-                                <div class="text-danger fw-bold">${p.price}đ</div>
+                                <div class="text-danger fw-bold"><fmt:formatNumber value="${p.price}" pattern="#,###"/>đ</div>
                             </div>
                         </div>
                     </div>
@@ -284,7 +286,9 @@
                     <!-- CARD SẢN PHẨM -->
                     <div class="col-6 col-md-4 col-lg-3">
                     <div class="product-card h-100">
-                            <div class="ribbon">SALE</div>
+                            <c:if test="${p.sale}">
+                                <div class="ribbon">${p.promotionLabel}</div>
+                            </c:if>
                             <a href="product?id=${p.id}">
                                 <img src="${p.image_url}" class="card-img-top" alt="${p.name}">
                             </a>
@@ -292,7 +296,7 @@
                                 <div class="product-title">${p.name}</div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="text-danger fw-bold">
-                                            ${p.price}đ
+                                    <fmt:formatNumber value="${p.price}" pattern="#,###"/>đ
                                     </div>
                                     <a href="product?id=${p.id}" class="btn btn-sm btn-outline-danger">Chi tiết</a>
                                 </div>
@@ -375,7 +379,9 @@
 
                     <div class="col-6 col-md-4 col-lg-3">
                     <div class="product-card h-100">
-                            <div class="ribbon">SALE</div>
+                            <c:if test="${p.sale}">
+                                <div class="ribbon">${p.promotionLabel}</div>
+                            </c:if>
                             <a href="product?id=${p.id}">
                                 <img src="${p.image_url}" class="card-img-top" alt="${p.name}">
                             </a>
@@ -383,7 +389,7 @@
                                 <div class="product-title">${p.name}</div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="text-danger fw-bold">
-                                            ${p.price}đ
+                                    <fmt:formatNumber value="${p.price}" pattern="#,###"/>đ
                                     </div>
                                     <a href="product?id=${p.id}" class="btn btn-sm btn-outline-danger">Chi tiết</a>
                                 </div>

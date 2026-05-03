@@ -32,6 +32,22 @@
 
     String back = request.getParameter("back");
     String emailParam = request.getParameter("email");
+
+    // Đọc cookie ghi nhớ đăng nhập
+    String rememberedEmail = "";
+    boolean isRemembered = false;
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+        for (Cookie c : cookies) {
+            if ("rememberEmail".equals(c.getName()) && !c.getValue().isBlank()) {
+                rememberedEmail = c.getValue();
+                isRemembered = true;
+                break;
+            }
+        }
+    }
+    // email param (sau submit lỗi) ưu tiên hơn cookie
+    String fillEmail = (emailParam != null && !emailParam.isBlank()) ? emailParam : rememberedEmail;
 %>
 
 <!DOCTYPE html>
@@ -104,17 +120,24 @@
                                 <label for="loginEmail" class="form-label">Email <span
                                         class="text-danger">*</span></label>
                                 <input type="email" class="form-control" id="loginEmail" name="email"
-                                       placeholder="Email" required value="<%= esc(emailParam) %>">
+                                       placeholder="Email" required value="<%= esc(fillEmail) %>">
                             </div>
                             <div class="mb-4">
                                 <label for="loginPassword" class="form-label">Mật khẩu <span
                                         class="text-danger">*</span></label>
-                                <input type="password" class="form-control" id="loginPassword" name="password"
-                                       placeholder="Mật khẩu" required>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="loginPassword" name="password"
+                                           placeholder="Mật khẩu" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword"
+                                            title="Ẩn/hiện mật khẩu">
+                                        <i class="bi bi-eye" id="eyeIcon"></i>
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                                <input class="form-check-input" type="checkbox" id="remember" name="remember"
+                                       <%= isRemembered ? "checked" : "" %>>
                                 <label class="form-check-label" for="remember">Ghi nhớ đăng nhập</label>
                             </div>
 
@@ -209,6 +232,20 @@
     }
 
     document.addEventListener('DOMContentLoaded', updateCartCount);
+</script>
+<!-- JS: toggle ẩn/hiện mật khẩu -->
+<script>
+    document.getElementById('togglePassword').addEventListener('click', function () {
+        const pwInput = document.getElementById('loginPassword');
+        const eyeIcon = document.getElementById('eyeIcon');
+        if (pwInput.type === 'password') {
+            pwInput.type = 'text';
+            eyeIcon.classList.replace('bi-eye', 'bi-eye-slash');
+        } else {
+            pwInput.type = 'password';
+            eyeIcon.classList.replace('bi-eye-slash', 'bi-eye');
+        }
+    });
 </script>
 </body>
 </html>

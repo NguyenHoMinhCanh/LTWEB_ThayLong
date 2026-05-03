@@ -1,7 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
+
 
 <%
     request.setAttribute("pageTitle", "Chi tiết Đơn hàng - Admin");
@@ -40,7 +42,7 @@
                     <div class="mb-2"><strong>Địa chỉ:</strong> ${order.fullAddress}</div>
                     <div class="mb-2"><strong>Trạng thái:</strong> ${order.statusVi} <span class="text-muted">(${order.status})</span></div>
                     <div class="mb-2"><strong>Ngày tạo:</strong> ${order.createdAt}</div>
-                    <div class="mb-0"><strong>Tổng tiền:</strong> ${order.totalAmount}</div>
+                    <div class="mb-0"><strong>Tổng tiền:</strong> <fmt:formatNumber value="${order.totalAmount}" pattern="#,###"/>đ</div>
 
                     <hr class="my-3"/>
 
@@ -94,8 +96,8 @@
                                     <td>${it.size}</td>
                                     <td>${it.color}</td>
                                     <td>${it.quantity}</td>
-                                    <td>${it.unitPrice}</td>
-                                    <td>${it.subtotal}</td>
+                                    <td><fmt:formatNumber value="${it.unitPrice}" pattern="#,###"/>đ</td>
+                                    <td><fmt:formatNumber value="${it.subtotal}" pattern="#,###"/>đ</td>
                                 </tr>
                             </c:forEach>
 
