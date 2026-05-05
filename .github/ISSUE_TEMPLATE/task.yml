@@ -1,0 +1,15 @@
+name: Task
+description: Tạo task mới
+title: "[Task]: "
+labels: ["Task"]
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - Task
+        - Bug
+        - Feature
+    validations:
+      required: true
