@@ -23,6 +23,11 @@
         font-weight: 600;
         letter-spacing: .2px;
     }
+    .tbl-banners-admin td.bn-cell-url a,
+    .tbl-banners-admin .bn-cell-meta {
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
 </style>
 
 <div class="d-flex align-items-center justify-content-between mb-3">
@@ -80,7 +85,7 @@
         </form>
 
         <div class="table-responsive">
-            <table class="table align-middle table-hover">
+            <table class="table align-middle table-hover tbl-banners-admin">
                 <thead>
                 <tr>
                     <th style="width: 80px;">ID</th>
@@ -99,27 +104,27 @@
                         <td>
                             <c:choose>
                                 <c:when test="${fn:startsWith(b.image_url, 'http')}">
-                                    <img class="bn-img" src="${b.image_url}" alt="${b.title}"/>
+                                    <img class="bn-img" src="<c:out value='${b.image_url}'/>" alt="<c:out value='${b.title}'/>"/>
                                 </c:when>
                                 <c:otherwise>
-                                    <img class="bn-img" src="${ctx}/${b.image_url}" alt="${b.title}"/>
+                                    <img class="bn-img" src="${ctx}/<c:out value='${b.image_url}'/>" alt="<c:out value='${b.title}'/>"/>
                                 </c:otherwise>
                             </c:choose>
                         </td>
                         <td>
-                            <div class="fw-semibold">${empty b.title ? "(Không tiêu đề)" : b.title}</div>
-                            <div class="text-muted small">${b.image_url}</div>
+                            <div class="fw-semibold"><c:out value="${empty b.title ? '(Không tiêu đề)' : b.title}"/></div>
+                            <div class="text-muted small bn-cell-meta"><c:out value="${b.image_url}"/></div>
                         </td>
                         <td>
-                            <span class="badge text-bg-info badge-pos">${empty b.position ? "(null)" : b.position}</span>
+                            <span class="badge text-bg-info badge-pos"><c:out value="${empty b.position ? '(null)' : b.position}"/></span>
                         </td>
-                        <td style="max-width: 260px;">
+                        <td class="bn-cell-url" style="max-width: 260px;">
                             <c:choose>
                                 <c:when test="${empty b.link}">
                                     <span class="text-muted">—</span>
                                 </c:when>
                                 <c:otherwise>
-                                    <a href="${b.link}" target="_blank" rel="noopener">${b.link}</a>
+                                    <a href="<c:out value='${b.link}'/>" target="_blank" rel="noopener noreferrer"><c:out value="${b.link}"/></a>
                                 </c:otherwise>
                             </c:choose>
                         </td>

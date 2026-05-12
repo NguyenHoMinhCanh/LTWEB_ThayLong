@@ -80,18 +80,22 @@ body{
 /* SHELL */
 .adm-shell{
     display:flex;
+    flex-direction: row;
+    align-items: stretch;
     min-height: calc(100vh - 64px);
 }
 
 /* SIDEBAR */
 .adm-sidebar{
     width: 260px;
+    flex-shrink: 0;
     background: var(--adm-card);
     border-right: 1px solid var(--adm-border);
     position: sticky;
     top: 64px;
     height: calc(100vh - 64px);
     overflow:auto;
+    z-index: 1051;
 }
 .adm-sidebar__inner{
     padding: 14px;
@@ -132,6 +136,7 @@ body{
 /* MAIN */
 .adm-main{
     flex:1;
+    min-width: 0;
     padding: 16px;
 }
 .adm-content{
@@ -156,7 +161,7 @@ body{
         position: fixed;
         left: -280px;
         top: 64px;
-        z-index: 1040;
+        z-index: 1051;
         transition: .2s ease;
         box-shadow: 0 20px 50px rgba(0,0,0,.2);
     }

@@ -17,7 +17,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mb-0">Quản lý Sản phẩm</h4>
-    <button class="btn btn-primary" id="btnAdd">
+    <button class="btn btn-primary" id="btnAddProduct">
         <i class="bi bi-plus-lg me-1"></i> Thêm sản phẩm
     </button>
 </div>
@@ -52,7 +52,7 @@
         <form class="modal-content" id="formProduct">
             <div class="modal-header">
                 <h5 id="modalTitle">Thêm sản phẩm</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button typ e="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" name="id" id="productId">
@@ -83,7 +83,6 @@
                         <label class="form-label">Thương hiệu</label>
                         <select class="form-select" name="brand_id" id="productBrand"></select>
                     </div>
-                </div>
 
                 <div class="col-md-6">
                     <label class="form-label">Giới tính</label>

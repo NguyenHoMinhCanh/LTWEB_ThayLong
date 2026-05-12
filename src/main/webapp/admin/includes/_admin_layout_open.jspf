@@ -1,3 +1,4 @@
+<%@ page pageEncoding="UTF-8" %>
 <%@ include file="/admin/includes/_admin_head.jspf" %>
 <%@ include file="/admin/includes/_admin_topbar.jspf" %>
 

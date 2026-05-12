@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <aside id="sidebar" class="sidebar border-end bg-white">
     <div class="sidebar-inner">
         <ul class="s-nav">

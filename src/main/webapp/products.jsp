@@ -372,10 +372,8 @@
                             <% } %>
 
                             <%-- ẢNH: GIỮ CLASS product-thumb, chỉ thêm khung tỉ lệ để đồng đều --%>
-                            <a class="product-thumb ratio ratio-1x1 mb-0"
-                               href="<%= ctx %>/product?id=<%= p.getId() %>">
-                                <img src="<%= p.getImage_url() %>" alt="<%= p.getName() %>" class="img-cover">
-
+                            <a href="<%= ctx %>/product?id=<%= p.getId() %>">
+                                <img src="<%= p.getImage_url() %>" alt="<%= p.getName() %>" class="card-img-top">
                             </a>
 
                             <div class="p-3 d-flex flex-column flex-fill">

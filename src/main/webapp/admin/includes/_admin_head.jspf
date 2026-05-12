@@ -1,3 +1,4 @@
+<%@ page pageEncoding="UTF-8" %>
 <%@ include file="/admin/includes/_admin_init.jspf" %>
 <%
     String ctx = (String) request.getAttribute("ctx");
