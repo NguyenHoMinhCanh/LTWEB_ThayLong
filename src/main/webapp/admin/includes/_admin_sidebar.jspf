@@ -9,6 +9,7 @@
     String activeBrands     = "brands".equals(ap)     ? "active" : "";
     String activeNews       = "news".equals(ap)       ? "active" : "";
     String activeBanners    = "banners".equals(ap)    ? "active" : "";
+    String activeVouchers   = "vouchers".equals(ap)   ? "active" : "";
     String activeOrders     = "orders".equals(ap)     ? "active" : "";
     String activePolicies   = "policies".equals(ap)   ? "active" : "";
     String activeUsers      = "users".equals(ap)      ? "active" : "";
@@ -48,6 +49,10 @@
         <div class="adm-section">BÁN HÀNG</div>
         <a class="adm-item <%= activeOrders %>" href="${ctx}/admin/orders">
             <i class="bi bi-receipt"></i><span>Đơn hàng</span>
+        </a>
+
+        <a class="adm-item <%= activeVouchers %>" href="${ctx}/admin/voucher">
+            <i class="bi bi-ticket-perforated"></i><span>Voucher</span>
         </a>
 
         <div class="adm-section">HỆ THỐNG</div>
