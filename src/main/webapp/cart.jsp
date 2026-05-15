@@ -117,10 +117,10 @@
 
         <div class="row mt-4 g-4">
             <div class="col-lg-7">
-                <form method="post" action="<%=ctx%>/cart" class="d-inline">
+                <form method="post" action="<%=ctx%>/cart" id="clear-cart-form">
                     <input type="hidden" name="action" value="clear"/>
-                    <button class="btn btn-outline-secondary" type="submit">
-                        <i class="bi bi-trash3 me-1"></i> Xoá toàn bộ giỏ
+                    <button class="btn btn-accent d-flex align-items-center" type="button" onclick="confirmClearCart()">
+                        <i class="bi bi-trash3 me-2"></i> Xoá toàn bộ giỏ hàng
                     </button>
                 </form>
             </div>
@@ -225,6 +225,26 @@
     </div>
 </div>
 
+<div class="modal fade" id="clearCartModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold">Xác nhận xóa sạch giỏ hàng</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="bi bi-exclamation-octagon text-danger" style="font-size: 3rem;"></i>
+                <p class="mt-3 fs-5">Bạn có chắc chắn muốn xóa <strong>toàn bộ</strong> sản phẩm không?</p>
+                <span class="text-muted small">Hành động này không thể hoàn tác.</span>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Quay lại</button>
+                <button type="button" class="btn btn-danger rounded-pill px-4" onclick="submitClearCart()">Đồng ý xóa sạch</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <%@ include file="/WEB-INF/jspf/site_footer.jspf" %>
 
 <button class="btn btn-danger position-fixed bottom-0 end-0 m-4 rounded-circle"
@@ -242,6 +262,30 @@
     .cart-img-link:hover {
         opacity: 0.8;
         transition: 0.3s;
+    }
+    :root {
+        --accent-color: #ff5722;
+        --accent-hover: #e64a19;
+    }
+
+    .btn-accent {
+        background-color: var(--accent-color);
+        color: white;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-accent:hover {
+        background-color: var(--accent-hover);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+    }
+
+    #clearCartModal .modal-content {
+        border-radius: 15px;
     }
 </style>
 
@@ -350,6 +394,25 @@
             }
         });
     }
+    // --- 4.Khởi tạo Modal cho xóa toàn bộ ---
+    let clearCartModal = null;
+    const clearModalEl = document.getElementById('clearCartModal');
+    if (clearModalEl) {
+        clearCartModal = new bootstrap.Modal(clearModalEl);
+    }
+
+    // Hàm mở Modal
+    function confirmClearCart() {
+        if (clearCartModal) {
+            clearCartModal.show();
+        }
+    }
+
+    // Hàm thực hiện submit form khi người dùng đồng ý
+    function submitClearCart() {
+        document.getElementById('clear-cart-form').submit();
+    }
+
 </script>
 </body>
 </html>
