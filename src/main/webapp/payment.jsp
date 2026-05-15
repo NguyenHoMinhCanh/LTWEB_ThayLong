@@ -18,8 +18,8 @@
         items = cart.getItems();
     }
 
+    // Lấy dữ liệu và ép kiểu an toàn
     User u = (User) session.getAttribute("currentUser");
-
     UserAddress defAddr = (UserAddress) request.getAttribute("defaultAddress");
 
     String shipEmail = (u != null ? u.getEmail() : "");
@@ -27,17 +27,21 @@
     String shipPhone = "";
     String shipAddressLine = "";
     String shipCity = "";
-    String shipDistrict = "";
     String shipWard = "";
 
     if (defAddr != null) {
-        if (defAddr.getFullName() != null) shipName = defAddr.getFullName();
-        if (defAddr.getPhone() != null) shipPhone = defAddr.getPhone();
-        if (defAddr.getAddressLine() != null) shipAddressLine = defAddr.getAddressLine();
-        if (defAddr.getCity() != null) shipCity = defAddr.getCity();
-        if (defAddr.getDistrict() != null) shipDistrict = defAddr.getDistrict();
-        if (defAddr.getWard() != null) shipWard = defAddr.getWard();
+        shipName = defAddr.getFullName();
+        shipPhone = defAddr.getPhone();
+        shipAddressLine = defAddr.getAddressLine();
+        shipCity = defAddr.getCity();
+        shipWard = defAddr.getWard();
     }
+
+    shipName = (shipName == null || shipName.equals("null")) ? (u != null ? u.getName() : "") : shipName;
+    shipPhone = (shipPhone == null || shipPhone.equals("null")) ? (u != null ? u.getPhone() : "") : shipPhone;
+    shipAddressLine = (shipAddressLine == null || shipAddressLine.equals("null")) ? "" : shipAddressLine;
+    shipCity = (shipCity == null || shipCity.equals("null")) ? "" : shipCity;
+    shipWard = (shipWard == null || shipWard.equals("null")) ? "" : shipWard;
 
     if (shipName == null || shipName.isBlank()) shipName = (u != null ? u.getName() : "");
     if (shipPhone == null || shipPhone.isBlank()) shipPhone = (u != null ? u.getPhone() : "");
@@ -70,7 +74,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Thanh toán</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+          rel="stylesheet"/>
     <link rel="stylesheet" href="assets/css/style.css"/>
 </head>
 <body>
@@ -90,7 +95,8 @@
     </div>
 
     <% if (errorMessage != null) { %>
-    <div class="alert alert-danger"><%=errorMessage%></div>
+    <div class="alert alert-danger"><%=errorMessage%>
+    </div>
     <% } %>
 
     <div class="row g-4">
@@ -114,41 +120,42 @@
                             </div>
 
                             <div class="col-12">
-                                <input class="form-control" type="tel" name="phone" value="<%= shipPhone %>" placeholder="Số điện thoại" required>
+                                <input class="form-control" type="tel" name="phone" value="<%= shipPhone %>"
+                                       placeholder="Số điện thoại" required>
                                 <div class="invalid-feedback">Vui lòng nhập số điện thoại.</div>
                             </div>
 
-                            <div class="col-12">
-                                <input class="form-control" type="text" name="addressLine" value="<%= shipAddressLine %>" placeholder="Địa chỉ" required>
-                                <div class="invalid-feedback">Vui lòng nhập địa chỉ.</div>
-                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted">Tỉnh / Thành phố</label>
+                                    <select class="form-select" id="city" name="city" required>
+                                        <option value="" selected disabled>Chọn Tỉnh/Thành</option>
+                                    </select>
+                                    <div class="invalid-feedback">Vui lòng chọn Tỉnh/Thành.</div>
+                                </div>
 
-                            <div class="col-md-4">
-                                <select class="form-select" name="city" required>
-                                    <option value="" <%= (cityNormalized.isBlank() ? "selected" : "") %>>Tỉnh/Thành</option>
-                                    <option <%= ("Hà Nội".equals(cityNormalized) ? "selected" : "") %>>Hà Nội</option>
-                                    <option <%= ("TP. Hồ Chí Minh".equals(cityNormalized) ? "selected" : "") %>>TP. Hồ Chí Minh</option>
-                                    <option <%= ("Đà Nẵng".equals(cityNormalized) ? "selected" : "") %>>Đà Nẵng</option>
-                                    <option <%= ("Khác".equals(cityNormalized) ? "selected" : "") %>>Khác</option>
-                                </select>
-                                <div class="invalid-feedback">Chọn Tỉnh/Thành.</div>
-                            </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted">Phường / Xã</label>
+                                    <input type="text" class="form-control" name="ward"
+                                           value="<%= shipWard %>" placeholder="Ví dụ: Phường 15, Quận 10" required>
+                                    <div class="invalid-feedback">Vui lòng nhập Phường/Xã.</div>
+                                </div>
 
-                            <div class="col-md-4">
-                                <input class="form-control" name="district" value="<%= shipDistrict %>" placeholder="Quận/Huyện" required>
-                                <div class="invalid-feedback">Nhập Quận/Huyện.</div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <input class="form-control" name="ward" value="<%= shipWard %>" placeholder="Phường/Xã" required>
-                                <div class="invalid-feedback">Nhập Phường/Xã.</div>
+                                <div class="col-12">
+                                    <label class="form-label small text-muted">Địa chỉ cụ thể</label>
+                                    <input class="form-control" type="text" name="addressLine"
+                                           value="<%= shipAddressLine %>"
+                                           placeholder="Số nhà, tên đường..." required>
+                                    <div class="invalid-feedback">Vui lòng nhập số nhà, tên đường.</div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="mt-4">
                             <h5 class="mb-2">Thanh toán</h5>
                             <div class="form-check border rounded p-3 mb-2">
-                                <input class="form-check-input" type="radio" name="payMethod" id="payBank" value="bank" checked>
+                                <input class="form-check-input" type="radio" name="payMethod" id="payBank" value="bank"
+                                       checked>
                                 <label class="form-check-label" for="payBank">
                                     Chuyển khoản / Nộp tiền mặt vào tài khoản
                                 </label>
@@ -162,7 +169,8 @@
                         </div>
 
                         <div class="mt-4">
-                            <textarea class="form-control" name="note" rows="3" placeholder="Ghi chú (tuỳ chọn)"></textarea>
+                            <textarea class="form-control" name="note" rows="3"
+                                      placeholder="Ghi chú (tuỳ chọn)"></textarea>
                         </div>
 
                         <div class="mt-4 d-grid">
@@ -186,9 +194,11 @@
                                 <img class="item-thumb" src="<%=it.getImageUrl()%>" alt="<%=it.getProductName()%>">
                                 <span class="qty-badge"><%=it.getQuantity()%></span>
                                 <div class="ms-1" style="max-width:280px">
-                                    <div class="fw-semibold small"><%=it.getProductName()%></div>
+                                    <div class="fw-semibold small"><%=it.getProductName()%>
+                                    </div>
                                     <% if (it.getVariantId() != null) { %>
-                                    <div class="small text-muted">Màu: <%=it.getColor()%> | Size: <%=it.getSize()%></div>
+                                    <div class="small text-muted">Màu: <%=it.getColor()%> | Size: <%=it.getSize()%>
+                                    </div>
                                     <% } %>
                                 </div>
                             </div>
@@ -199,7 +209,8 @@
 
                     <div class="divider"></div>
 
-                    <div class="sum-line"><span>Tạm tính</span><strong><%=String.format("%,.0f", subtotal)%>₫</strong></div>
+                    <div class="sum-line"><span>Tạm tính</span><strong><%=String.format("%,.0f", subtotal)%>₫</strong>
+                    </div>
                     <div class="sum-line"><span>Phí vận chuyển</span><span>0₫</span></div>
                     <div class="sum-line"><span>Giảm giá</span><span>0₫</span></div>
                     <div class="divider"></div>
@@ -225,6 +236,31 @@
             e.stopPropagation();
             form.classList.add('was-validated');
         }
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        const citySelect = document.getElementById('city');
+        const savedCity = "<%= cityNormalized %>".trim();
+
+        // Chỉ load Tỉnh/Thành để chuẩn hóa dữ liệu vùng miền
+        fetch('https://provinces.open-api.vn/api/p/')
+            .then(res => res.json())
+            .then(data => {
+                citySelect.innerHTML = '<option value="" selected disabled>Chọn Tỉnh/Thành</option>';
+
+                data.forEach(p => {
+                    let opt = new Option(p.name, p.name);
+                    if (p.name === savedCity) opt.selected = true;
+                    citySelect.add(opt);
+                });
+            })
+            .catch(err => {
+                console.error("API Error:", err);
+                // Nếu API sập, biến nó thành ô Input để khách vẫn nhập được
+                citySelect.parentElement.innerHTML = `
+                <label class="form-label small text-muted">Tỉnh / Thành phố</label>
+                <input type="text" class="form-control" name="city" value="${savedCity}" required>
+            `;
+            });
     });
 </script>
 </body>
